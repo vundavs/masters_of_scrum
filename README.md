@@ -32,7 +32,7 @@ src/
 
 ---
 
-## Git rules
+## Git practices
 
 - **Never commit directly to `main`** — always create your own branch first:
 ```bash
