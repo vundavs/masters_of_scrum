@@ -1,10 +1,10 @@
 # Proposed timeline & task allocation
 
 ## Team member priorities
-- Person A (auth & registration)
-- Person B (events & search)
-- Person C (bookings & cancellations)
-- Person D (reviews, sponsors & integration)
+- Shayaan (auth & registration)
+- Katie (events & search)
+- Sahasra (bookings & cancellations)
+- Leo (reviews, sponsors & integration)
 
 ---
 
@@ -12,7 +12,7 @@
 
 ---
 
-### Person A — auth & registration
+### Shayaan — auth & registration
 
 #### Model classes
 - [ ] Create `User.java` (abstract base class with email, password, getters)
@@ -36,7 +36,7 @@
 
 ---
 
-### Person B — events & search
+### Katie— events & search
 
 #### Model classes
 - [ ] Create `Event.java`
@@ -60,7 +60,7 @@
 
 ---
 
-### Person C — bookings & cancellations
+### Sahasra — bookings & cancellations
 
 #### Model classes
 - [ ] Create `Booking.java`
@@ -80,7 +80,7 @@
 
 ---
 
-### Person D — reviews, sponsors & integration
+### Leo — reviews, sponsors & integration
 
 #### Model classes
 - [ ] Create `Review.java`
@@ -162,15 +162,14 @@
 
 ## Key dates
 
-| Date | Milestone |
-|------|-----------|
-| Mar 19 | Everyone set up and ready to code |
-| Mar 26 | All 12 use cases implemented |
-| Mar 28 | Faculty Members implementation and tests fully done |
-| Mar 28–31 | **Code review lab** |
-| Mar 30 | All unit and system tests passing |
-| Apr 5  | Everything finalised and ready to submit |
-| **Apr 6, 12:00** | **Deadline** |
-| Apr 6, 12:30 | Declarations deadline |
+| Date            | Milestone                                                              |
+|-----------------|------------------------------------------------------------------------|
+| Mar 19          | Everyone set up and ready to code                                      |
+| Mar 27          | All 12 use cases implemented, tests and Faculty Members implementation |                                           |
+| Mar 31          | **Code review lab**                                                    |
+| Mar 30          | All unit and system tests passing                                      |
+| Apr 5           | Everything finalised and ready to submit                               |
+| **Apr 6, 12:00** | **Deadline**                                                           |
+| Apr 6, 12:30    | Declarations deadline                                                  |
 ---
 
