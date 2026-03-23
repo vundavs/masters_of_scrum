@@ -79,6 +79,6 @@ public class Student extends User {
      * @param booking the booking to add
      */
     public void addBooking(Booking booking) {
-        this.bookings.add(booking);
+        bookings.add(booking);
     }
 }
