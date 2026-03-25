@@ -15,61 +15,74 @@
 ### Shayaan — auth & registration
 
 #### Model classes
-- [ ] Create `User.java` (abstract base class with email, password, getters)
-- [ ] Create `Student.java` (extends User)
-- [ ] Create `Staff.java` (extends User)
-- [ ] Create `EntertainmentProvider.java` (extends User)
-- [ ] Create `ConsumerPreferences.java`
+- [ ] `User.java` — abstract base class with email, password, getters
+- [ ] `Student.java` — extends User, includes phoneNumber, bookings list, preferences
+- [ ] `AdminStaff.java` — extends User
+- [ ] `EntertainmentProvider.java` — extends User, includes orgName, businessNumber, events list
+- [ ] `StudentPreferences.java` — preferMusicEvents, preferTheaterEvents etc.
 
-#### EventsApp methods
-- [ ] Create initial `EventsApp.java` skeleton (fields, constructor, hardcoded student/staff accounts)
-- [ ] Implement `logIn()`
-- [ ] Implement `logOut()`
-- [ ] Implement `registerEntertainmentProvider()`
+#### Controller
+- [ ] `UserController.java` — implement `login()`, `logout()`, `registerEntertainmentProvider()`
+- [ ] Add `editPreferences()` to `UserController.java`
 
 #### Tests
-- [ ] `TestEventPerformance.java` — unit tests for EventPerformance
 - [ ] `LogInSystemTests.java`
 - [ ] `LogOutSystemTests.java`
 - [ ] `RegisterEntertainmentProviderSystemTests.java`
 - [ ] Faculty Members unit tests
 
 ---
-
-### Katie— events & search
+### Katie — events, search & EP actions
 
 #### Model classes
-- [ ] Create `Event.java`
-- [ ] Create `EventPerformance.java`
+- [ ] `Event.java` — eventID, title, type, isTicketed, performances list
+- [ ] `Performance.java` — all fields from diagram, all methods from diagram
+- [ ] `EventType.java` — enum: MUSIC, THEATRE, DANCE, MOVIE, SPORTS
+- [ ] `PerformanceStatus.java` — enum: ACTIVE, CANCELLED
 
-#### EventsApp methods
-- [ ] Implement `createEvent()`
-- [ ] Implement `addEventPerformance()`
-- [ ] Implement `searchPerformances()`
-- [ ] Implement `getEventPerformance()`
+#### Controller
+- [ ] `EventPerformanceController.java` — implement `createEvent()`, `searchForPerformances()`, `viewPerformance()`, `cancelPerformance()`, `sponsorPerformance()`
+- [ ] Add `cancelPerformance()` method (written by Sahasra — paste it in)
 
 #### Tests
 - [ ] `TestMockPaymentSystem.java` — unit tests for MockPaymentSystem
 - [ ] `CreateEventSystemTests.java`
 - [ ] `SearchPerformancesSystemTests.java`
 - [ ] `ViewPerformanceSystemTests.java`
+- [ ] `CancelPerformanceSystemTests.java`
+- [ ] `SponsorPerformanceSystemTests.java`
 
 #### Faculty Members (eager migration — group 47 is odd)
-- [ ] Implement Pre-register Faculty Members use case (kept separate, not in main src)
-- [ ] Create mock faculty file for testing purposes
+- [ ] Implement Pre-register Faculty Members use case (separate project, not in main src)
+- [ ] Create mock faculty file for testing
 
+#### Critical — Performance.java must include these methods for everyone else's code to work:
+- [ ] `checkIfEventIsTicketed()`
+- [ ] `checkIfTicketsLeft(int n)`
+- [ ] `getFinalTicketPrice()`
+- [ ] `getOrganiserEmail()`
+- [ ] `getEventTitle()`
+- [ ] `getEventID()`
+- [ ] `getPerformanceId()`
+- [ ] `checkHasNotHappenedYet()`
+- [ ] `hasActiveBookings()`
+- [ ] `getBookingDetailsForRefund()`
+- [ ] `cancel()`
+- [ ] `checkCreatedByEP(String email)`
+- [ ] `review(int rating, String comment)`
+- [ ] `addBooking(Booking b)`
+- [ ] `sponsor(double amount)`
 ---
 
-### Sahasra — bookings & cancellations
+### Sahasra — bookings & reviews
 
 #### Model classes
-- [ ] Create `Booking.java`
-- [ ] Create `BookingStatus.java` (enum: ACTIVE, CANCELLED_BY_CONSUMER, CANCELLED_BY_PROVIDER)
+- [ ] `Booking.java` ✓
+- [ ] `BookingStatus.java` ✓ (ACTIVE, CANCELLEDBYSTUDENT, CANCELLEDBYPROVIDER, PAYMENTFAILED)
 
-#### EventsApp methods
-- [ ] Implement `bookPerformance()`
-- [ ] Implement `editPreferences()`
-- [ ] Implement `cancelPerformance()`
+#### Controllers
+- [ ] `Controller.java` ✓ — abstract base class
+- [ ] `BookingController.java` ✓ — `bookPerformance()`, `cancelBooking()`, `reviewPerformance()`
 
 #### Tests
 - [ ] `TestBooking.java` — unit tests for Booking
@@ -80,24 +93,18 @@
 
 ---
 
-### Leo — reviews, sponsors & integration
+### Leo — integration & report
 
-#### Model classes
-- [ ] Create `Review.java`
-- [ ] Create `Sponsorship.java`
-
-#### EventsApp methods
-- [ ] Implement `cancelBooking()`
-- [ ] Implement `reviewPerformance()`
-- [ ] Implement `sponsorPerformance()`
+#### Controller
+- [ ] `MenuController.java` — main menu, route to correct controller based on user type
 
 #### Tests
+- [ ] Run full test suite and fix any integration issues
+- [ ] `SponsorPerformanceSystemTests.java`
 - [ ] `CancelBookingSystemTests.java`
 - [ ] `ReviewPerformanceSystemTests.java`
-- [ ] `SponsorPerformanceSystemTests.java`
 
-#### Integration & report
-- [ ] Run full test suite and fix any integration issues
+#### Report
 - [ ] Lead Task 5 reflection — teamwork (≤250 words)
 - [ ] Lead Task 5 reflection — quality of work (≤250 words)
 - [ ] Lead Task 5 reflection — tools & agile practices with screenshots (≤250 words)
