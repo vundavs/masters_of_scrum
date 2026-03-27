@@ -1,3 +1,4 @@
+package model;
 import java.time.LocalDateTime;
 
 public class Event {
@@ -12,5 +13,4 @@ public class Event {
     public boolean isTicketed(){return isTicketed;}
 
     //performances list?
->>>>>>> d58e7821eee867117738e323e01fd2ae2a2ddd29
 }
