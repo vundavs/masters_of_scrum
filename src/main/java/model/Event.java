@@ -11,8 +11,5 @@ public class Event {
     public EventType getType(){return type;}
     public boolean isTicketed(){return isTicketed;}
 
-    public createPerformance(long performanceID, LocalDateTime startDateTime, LocalDateTime endDateTime, Collection<String> performerNames, String venueAddress, int venueCapacity, boolean venueIsOutdoors, boolean venueAllowsSmoking, int numTickets, double ticketPrice){
-
-    }
-
+    //performances list?
 }

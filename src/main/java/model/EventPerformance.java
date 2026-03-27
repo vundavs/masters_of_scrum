@@ -43,7 +43,9 @@ public class EventPerformance {
     }
 
     public String getOrganiserEmail(){
-
+        user.getEmail()
+                //DK IF MATCHES
+        //also is user not the student signed in??
     }
 
     public String getEventTitle(){
@@ -58,5 +60,28 @@ public class EventPerformance {
 
     }
 
+    public boolean hasActiveBookings(){
+
+    }
+
+    getBookingDetailsForRefund(){
+
+    }
+
+    public void sponsor(double amount){
+
+    }
+
+    public void review(in rating, String comment){
+
+    }
+
+    public void addBooking(Booking b){
+
+    }
+
+    public String toString(){
+
+    }
 }
 
