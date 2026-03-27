@@ -1,6 +1,6 @@
 import java.time.LocalDateTime;
 
-public class EventPerformance {
+public class Performance {
     private long performanceID;
     private LocalDateTime startDateTime;
     private LocalDateTime endDateTime;
@@ -18,8 +18,12 @@ public class EventPerformance {
     private Collection<String> reviewComments;
     private PerformanceStatus status;
 
-    public void cancel(){
+    public long getPerformanceID(Performance perfomance){
+        return performanceID
+    }
 
+    public void cancel(){
+        cancelByProvider();
     }
 
     public boolean checkIfEventIsTicketed(){
@@ -28,7 +32,7 @@ public class EventPerformance {
 
     public boolean checkIfTicketsLeft(int numTicketsToBuy){
         int ticketsLeft;
-        ticketsLeft = event.getTicketsTotal() - event.getNumTicketsSold() - numTicketsToBuy;
+        ticketsLeft = TicketsTotal() - TicketsSold() - numTicketsToBuy;
         if (ticketsLeft >= 0){
             return true;
         }
@@ -43,13 +47,12 @@ public class EventPerformance {
     }
 
     public String getOrganiserEmail(){
-        user.getEmail()
-                //DK IF MATCHES
-        //also is user not the student signed in??
+        return organiser.getUser().getEmail();
+                //DK IF MATCHES - organiser?
     }
 
     public String getEventTitle(){
-        return event.getTitle;
+        return event.getTitle();
     }
 
     public boolean checkHasNotHappenedYet(){
@@ -57,30 +60,41 @@ public class EventPerformance {
     }
 
     public boolean checkCreatedByEP(String email){
-
+        for (EntertainmentProvider e : entertainmentProvider){
+            if (e.getUser().getEmail().equals(email)){
+                //if email belongs to an EP
+                return true;
+            }
+        }
+        return false;
     }
 
     public boolean hasActiveBookings(){
-
+        if (numTicketsTotal > 0){
+            return true;
+        }
     }
 
-    getBookingDetailsForRefund(){
-
+    public String getBookingDetailsForRefund(){
+        //NOT SURE IF THIS IS CORRECT
+        return getBookingDetailsRefund();
     }
 
     public void sponsor(double amount){
-
+        if (sponsoredAmount > ticketPrice){
+            System.out.println("Sponsored amount is greater than ticket price");
+        } else {
+            isSponsored = true;
+            sponsoredAmount = amount;
+        }
     }
 
-    public void review(in rating, String comment){
-
+    public void review(int rating, String comment){
+         reviewRatings.add(rating);
+         reviewComments.add(comment);
     }
 
     public void addBooking(Booking b){
-
-    }
-
-    public String toString(){
 
     }
 }
