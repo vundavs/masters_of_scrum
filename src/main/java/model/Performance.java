@@ -1,4 +1,6 @@
+package model;
 import java.time.LocalDateTime;
+import java.util.*;
 
 public class Performance {
     private long performanceID;
@@ -14,8 +16,8 @@ public class Performance {
     private double ticketPrice;
     private boolean isSponsored;
     private double sponsoredAmount;
-    private Collection<int> reviewRatings;
-    private Collection<String> reviewComments;
+    private int[] reviewRatings;
+    private String[] reviewComments;
     private PerformanceStatus status;
 
     public void cancel(){
