@@ -1,6 +1,6 @@
 import java.time.LocalDateTime;
 
-public class EventPerformance {
+public class Performance {
     private long performanceID;
     private LocalDateTime startDateTime;
     private LocalDateTime endDateTime;
