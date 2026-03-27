@@ -1,3 +1,5 @@
+package model;
+
 /**
  * Stores a student's event type preferences, indicating which categories
  * of events they are interested in attending.
