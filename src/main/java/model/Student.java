@@ -9,7 +9,7 @@ public class Student extends User {
     private String name;
     private int phoneNumber;
     private ArrayList<Booking> bookings;
-    // TODO: add Student Preferences once implemented
+    private StudentPreferences preferences;
 
     /**
      * Creates a new Student with the given details.
@@ -24,6 +24,7 @@ public class Student extends User {
         this.name = name;
         this.phoneNumber = phoneNumber;
         this.bookings = new ArrayList<Booking>();
+        this.preferences = new StudentPreferences(false, false, false, false, false);
     }
 
     /**
@@ -80,5 +81,14 @@ public class Student extends User {
      */
     public void addBooking(Booking booking) {
         bookings.add(booking);
+    }
+
+    /**
+     * Gets the student's preferences.
+     *
+     * @return the student's preferences
+     */
+    public StudentPreferences getPreferences() {
+        return preferences;
     }
 }
