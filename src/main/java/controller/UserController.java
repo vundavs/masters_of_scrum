@@ -12,12 +12,11 @@ import java.util.List;
  * Contains all use case methods.
  */
 
-public class UserController {
+public class UserController extends Controller {
 
     private List<User> users = new ArrayList<>();
     private List<Event> events = new ArrayList<>();
     private List<Booking> bookings = new ArrayList<>();
-    private User currentUser = null;
 
     private final PaymentSystem paymentSystem;
     private final VerificationService verificationService;
@@ -33,103 +32,135 @@ public class UserController {
         this.verificationService = verificationService;
     }
 
-
     /**
-     * Books a performance for the currently logged-in consumer.
-     *
-     * @param performance the performance to book
-     * @param numTickets  the number of tickets to book
-     * @param paymentAcct the consumer's payment account number
-     * @return the new Booking if successful, null otherwise
+     * Logs in a user by prompting for email and password via the view.
+     * The user must not already be logged in.
      */
-    public Booking bookPerformance(
-            EventPerformance performance, int numTickets, String paymentAcct) {
+    public void login() {
+        if (!checkCurrentUserIsGuest()) {
+            view.displayError("Already logged in.");
+            return;
+        }
 
-        assert currentUser instanceof Consumer : "Must be logged in as a consumer";
-        if (!(currentUser instanceof Consumer)) return null;
-        if (performance == null) return null;
-        if (numTickets <= 0) return null;
-        if (paymentAcct == null) return null;
+        String email = view.getInput("Enter email: ");
+        String password = view.getInput("Enter password: ");
 
-        Consumer consumer = (Consumer) currentUser;
-
-        // Check consumer has not already booked this performance
-        for (Booking b : bookings) {
-            if (b.getConsumer().equals(consumer)
-                    && b.getEventPerformance().equals(performance)
-                    && b.getStatus() == BookingStatus.ACTIVE) {
-                return null;
+        for (User user : users) {
+            if (email.equals(user.getEmail()) && (password.equals(user.getPassword()))) {
+                currentUser = user;
+                view.displaySuccess("Successfully logged in.");
+                return;
             }
         }
 
-        // Check capacity
-        if (performance.getCapacityLimit() > 0
-                && performance.getNumBookings() + numTickets > performance.getCapacityLimit()) {
-            return null;
+        view.displayError("Incorrect email and/or password.");
+    }
+
+    /**
+     * Logs out the currently logged-in user.
+     * A user must be logged in to perform this action.
+     */
+    public void logout() {
+        if (checkCurrentUserIsGuest()) {
+            view.displayError("Not logged in.");
+            return;
         }
 
-        // Process payment
-        double totalCost = performance.getTicketPrice() * numTickets;
-        boolean paid = paymentSystem.processPayment(
-                paymentAcct,
-                performance.getEvent().getEntertainmentProvider().getPaymentAccountNumber(),
-                totalCost);
-        if (!paid) return null;
+        currentUser = null;
 
-        // Create and store booking
-        Booking booking = new Booking(consumer, performance, numTickets);
-        bookings.add(booking);
-        performance.addBooking(booking);
-        return booking;
+        view.displaySuccess("Logged out.");
     }
 
     /**
-     * Updates the preferences of the currently logged-in consumer.
-     *
-     * @param newPreferences the updated preferences
-     * @return the updated Consumer, or null on failure
+     * Registers a new entertainment provider by prompting for details via the view.
+     * The user must not already be logged in. Verifies the business number
+     * and logs the new provider in on success.
      */
-    public Consumer editPreferences(ConsumerPreferences newPreferences) {
-        assert currentUser instanceof Consumer : "Must be logged in as a consumer";
-        if (!(currentUser instanceof Consumer)) return null;
-        if (newPreferences == null) return null;
+    public void registerEntertainmentProvider() {
+        if (!checkCurrentUserIsGuest()) {
+            view.displayError("Already logged in. Can't register entertainment provider.");
+            return;
+        }
 
-        Consumer consumer = (Consumer) currentUser;
-        consumer.setPreferences(newPreferences);
-        return consumer;
+        String email = view.getInput("Enter email: ");
+        String password = view.getInput("Enter password: ");
+        String orgName = view.getInput("Enter organisation name: ");
+        String businessNumber = view.getInput("Enter business number: ");
+        String name = view.getInput("Enter name: ");
+        String description = view.getInput("Enter description: ");
+
+        if (EPAccountAlreadyExists(email, orgName, businessNumber)) {
+            view.displayError("Entertainment Provider already exists.");
+            return;
+        }
+
+        if (!verificationService.verifyEntertainmentProvider(businessNumber)) {
+            view.displayError("Unable to verify entertainment provider.");
+            return;
+        }
+
+        EntertainmentProvider ep = new EntertainmentProvider(email, password, orgName, businessNumber, name, description);
+
+        addUser(ep);
+        currentUser = ep;
+        view.displaySuccess("Successfully registered Entertainment Provider.");
+        return;
     }
 
     /**
-     * Cancels a performance and refunds all active bookings.
+     * Checks if an entertainment provider account already exists with the
+     * given email, organisation name, or business number.
      *
-     * @param performance the performance to cancel
-     * @return the cancelled EventPerformance, or null on failure
+     * @param email          the email to check
+     * @param orgName        the organisation name to check
+     * @param businessNumber the business number to check
+     * @return true if a matching entertainment provider already exists
      */
-    public EventPerformance cancelPerformance(EventPerformance performance) {
-        assert currentUser instanceof EntertainmentProvider
-                : "Must be logged in as an entertainment provider";
-        if (!(currentUser instanceof EntertainmentProvider)) return null;
-        if (performance == null) return null;
-
-        EntertainmentProvider ep = (EntertainmentProvider) currentUser;
-
-        // Check performance belongs to this EP
-        if (!performance.getEvent().getEntertainmentProvider().equals(ep)) return null;
-
-        // Refund all active bookings
-        for (Booking b : performance.getBookings()) {
-            if (b.getStatus() == BookingStatus.ACTIVE) {
-                double refund = b.getNumTickets() * performance.getTicketPrice();
-                paymentSystem.processRefund(
-                        ep.getPaymentAccountNumber(),
-                        b.getConsumer().getPaymentAccountNumber(),
-                        refund);
-                b.setStatus(BookingStatus.CANCELLED_BY_PROVIDER);
+    private boolean EPAccountAlreadyExists(String email, String orgName, String businessNumber) {
+        for (User user : users) {
+            if (user instanceof EntertainmentProvider) {
+                EntertainmentProvider ep = (EntertainmentProvider) user;
+                if (ep.getEmail().equals(email) ||
+                        ep.getOrgName().equals(orgName) ||
+                        ep.getBusinessNumber().equals(businessNumber)) {
+                    return true;
+                }
             }
         }
-
-        performance.setStatus(PerformanceStatus.CANCELLED);
-        return performance;
+        return false;
     }
+
+    /**
+     * Adds a user to the system's list of registered users.
+     *
+     * @param user the user to add
+     */
+    private void addUser(User user) {
+        users.add(user);
+        return;
+    }
+
+
+    /**
+     * Updates the preferences of the currently logged-in student
+     * by prompting for preference keywords via the view.
+     */
+    public void editPreferences() {
+        if (!checkCurrentUserIsStudent()){
+            view.displayError("User must be a student to update preferences.");
+            return;
+        }
+
+        Student student = (Student) currentUser;
+        StudentPreferences preferences = student.getPreferences();
+
+        String input = view.getInput("Enter new preferences e.g. (music, dance, movie, sports): ");
+        preferences.updatePreferences(input);
+
+        view.displaySuccess("Successfully updated preferences.");
+        return;
+    }
+
+
 
 }
