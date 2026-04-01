@@ -1,11 +1,12 @@
 package model;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 public class Performance {
     private long performanceID;
     private LocalDateTime startDateTime;
     private LocalDateTime endDateTime;
-    private Collection<String> performerNames;
+    private ArrayList<String> performerNames;
     private String venueAddress;
     private int venueCapacity;
     private boolean venueIsOutdoors;
@@ -15,12 +16,12 @@ public class Performance {
     private double ticketPrice;
     private boolean isSponsored;
     private double sponsoredAmount;
-    private Collection<int> reviewRatings;
-    private Collection<String> reviewComments;
+    private ArrayList<Integer> reviewRatings;
+    private ArrayList<String> reviewComments;
     private PerformanceStatus status;
 
     public long getPerformanceID(Performance perfomance){
-        return performanceID
+        return performanceID;
     }
 
     public void cancel(){

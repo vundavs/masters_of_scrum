@@ -1,5 +1,7 @@
+package model;
+
 public enum EventType {
-    MUSIC
+    MUSIC,
     THEATRE,
     DANCE,
     MOVIE,
