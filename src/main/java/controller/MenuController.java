@@ -18,7 +18,7 @@ import java.util.List;
  * <p>Contains inner enums for each user type's menu options (as shown on the
  * class diagram). Holds references to all sub-controllers (1-1) and to the
  * shared {@link Performance} and {@link Booking} collections that are passed
- * into {@link EventsPerformanceController} and {@link BookingController}.
+ * into {@link EventPerformanceController} and {@link BookingController}.
  */
 public class MenuController extends Controller {
 
@@ -61,12 +61,12 @@ public class MenuController extends Controller {
     // Sub-controllers
 
     private final UserController userController;
-    private final EventsPerformanceController eventsPerformanceController;
+    private final EventPerformanceController eventPerformanceController;
     private final BookingController bookingController;
 
     /**
      * Shared list of performances: initialised here and passed to both
-     * EventsPerformanceController and BookingController so they operate on
+     * EventPerformanceController and BookingController so they operate on
      * the same data.
      */
     private final List<Performance> performances;
@@ -99,7 +99,7 @@ public class MenuController extends Controller {
         this.userController = new UserController(paymentSystem, verificationService);
         this.userController.view = view;
 
-        this.eventsPerformanceController = new EventsPerformanceController(view, performances);
+        this.eventPerformanceController = new EventPerformanceController(view, performances);
 
         this.bookingController = new BookingController(paymentSystem, view, performances, bookings);
     }
@@ -186,10 +186,10 @@ public class MenuController extends Controller {
                 syncCurrentUser();
                 break;
             case SEARCH_FOR_PERFORMANCES:
-                eventsPerformanceController.searchForPerformances();
+                eventPerformanceController.searchForPerformances();
                 break;
             case VIEW_PERFORMANCE:
-                eventsPerformanceController.viewPerformance();
+                eventPerformanceController.viewPerformance();
                 break;
             case REVIEW_PERFORMANCE:
                 bookingController.reviewPerformance();
@@ -232,16 +232,16 @@ public class MenuController extends Controller {
                 syncCurrentUser();
                 break;
             case SEARCH_FOR_PERFORMANCES:
-                eventsPerformanceController.searchForPerformances();
+                eventPerformanceController.searchForPerformances();
                 break;
             case VIEW_PERFORMANCE:
-                eventsPerformanceController.viewPerformance();
+                eventPerformanceController.viewPerformance();
                 break;
             case CREATE_EVENT:
-                eventsPerformanceController.createEvent();
+                eventPerformanceController.createEvent();
                 break;
             case CANCEL_PERFORMANCE:
-                eventsPerformanceController.cancelPerformance();
+                eventPerformanceController.cancelPerformance();
                 break;
             default:
                 view.displayError("Unknown option.");
@@ -272,13 +272,13 @@ public class MenuController extends Controller {
                 syncCurrentUser();
                 break;
             case SEARCH_FOR_PERFORMANCES:
-                eventsPerformanceController.searchForPerformances();
+                eventPerformanceController.searchForPerformances();
                 break;
             case VIEW_PERFORMANCE:
-                eventsPerformanceController.viewPerformance();
+                eventPerformanceController.viewPerformance();
                 break;
             case SPONSOR_PERFORMANCE:
-                eventsPerformanceController.sponsorPerformance();
+                eventPerformanceController.sponsorPerformance();
                 break;
             default:
                 view.displayError("Unknown option.");
@@ -297,7 +297,7 @@ public class MenuController extends Controller {
     private void syncCurrentUser() {
         User user = userController.getCurrentUser();
         this.currentUser = user;
-        eventsPerformanceController.setCurrentUser(user);
+        eventPerformanceController.setCurrentUser(user);
         bookingController.setCurrentUser(user);
     }
 
