@@ -20,9 +20,8 @@ import java.util.List;
  * Base class for all system tests.
  *
  * <p>Initialises the shared controller instances, pre-registered users, and
- * shared data collections.  Subclasses call {@link #initControllers(TestView)}
- * in each test method (or in a {@code @BeforeEach} setup) before exercising the
- * system under test.
+ * shared data collections. Subclasses call {@link #initControllers(TestView)}
+ * in each test method before exercising the system under test.
  *
  * <p>Pre-registered accounts available in every test:
  * <ul>
@@ -39,26 +38,18 @@ import java.util.List;
  */
 public abstract class TestSystemBase {
 
-    // -----------------------------------------------------------------------
-    // Shared state (accessible to all test subclasses)
-    // -----------------------------------------------------------------------
-
     protected UserController userController;
-    protected EventsPerformanceController epController;
+    protected EventPerformanceController epController;
     protected BookingController bookingController;
 
     protected List<Performance> performances;
     protected List<Booking> bookings;
     protected List<Event> events;
 
-    // -----------------------------------------------------------------------
-    // Setup
-    // -----------------------------------------------------------------------
-
     /**
-     * Initialises all controllers and shared collections, wiring them together
-     * with the given view.  Pre-registers two students and one admin staff
-     * member.  Also resets the booking number counter so tests are independent.
+     * Initialises all controllers and shared collections with the given view.
+     * Pre-registers two students and one admin staff member, and resets the
+     * booking number counter so each test starts from a clean state.
      *
      * @param view the TestView to attach to all controllers
      */
@@ -71,27 +62,22 @@ public abstract class TestSystemBase {
         MockVerificationService verificationService = new MockVerificationService();
 
         userController = new UserController(paymentSystem, verificationService);
-        userController.view = view;
+        userController.setView(view);
 
-        epController = new EventsPerformanceController(view, performances);
+        epController = new EventPerformanceController(view, performances);
         bookingController = new BookingController(paymentSystem, view, performances, bookings);
 
-        // Pre-register users (students and admin are not registered via the EP flow)
-        userController.addUser(new Student("student1@uni.ac.uk", "pass1", "Alice", 1111111111));
-        userController.addUser(new Student("student2@uni.ac.uk", "pass2", "Bob",   2222222222));
+        // Pre-register students and admin (not registered via the public EP flow)
+        userController.addUser(new Student("student1@uni.ac.uk", "pass1", "Alice", 111111111));
+        userController.addUser(new Student("student2@uni.ac.uk", "pass2", "Bob",   222222222));
         userController.addUser(new AdminStaff("admin@uni.ac.uk", "adminpass", "Admin User"));
 
-        // Ensure booking numbers start from 1 for each test
         Booking.resetBookingNumberCounter();
     }
 
-    // -----------------------------------------------------------------------
-    // Reusable setup helpers
-    // -----------------------------------------------------------------------
-
     /**
      * Registers a standard entertainment provider and returns it.
-     * Leaves the EP logged in as the current user of {@code userController}.
+     * Leaves the EP logged in on {@code userController}.
      *
      * <p>Credentials: email {@code ep@musicco.com}, password {@code eppass}.
      *
@@ -99,9 +85,9 @@ public abstract class TestSystemBase {
      * @return the newly registered EntertainmentProvider
      */
     protected EntertainmentProvider registerEP(TestView view) {
-        // UserController.registerEntertainmentProvider() prompts in this order:
-        // email, password, orgName, businessNumber (must be 10 chars), name, description
-        userController.setCurrentUser(null); // ensure guest state before registering
+        userController.setCurrentUser(null);
+        // registerEntertainmentProvider() prompts: email, password, orgName,
+        // businessNumber (must be 10 chars for MockVerificationService), name, description
         view.addInputs("ep@musicco.com", "eppass", "Music Co", "1234567890",
                 "John Smith", "Live music events");
         userController.registerEntertainmentProvider();
@@ -109,8 +95,8 @@ public abstract class TestSystemBase {
     }
 
     /**
-     * Creates a ticketed performance that has not yet happened, adds it to the
-     * shared {@code performances} and {@code events} lists, and returns it.
+     * Creates a ticketed future performance, adds it to the shared lists, and
+     * returns it.
      *
      * @param ep the entertainment provider who owns the event
      * @return the created Performance
@@ -132,8 +118,8 @@ public abstract class TestSystemBase {
     }
 
     /**
-     * Creates a ticketed performance that has already happened, adds it to the
-     * shared lists, and returns it.
+     * Creates a ticketed past performance, adds it to the shared lists, and
+     * returns it.
      *
      * @param ep the entertainment provider who owns the event
      * @return the created Performance
@@ -155,19 +141,18 @@ public abstract class TestSystemBase {
     }
 
     /**
-     * Resets all controllers to guest state, then logs in as the student with
-     * the given credentials and propagates the current user to all controllers.
+     * Resets all controllers to guest state, logs in as the given student, and
+     * propagates the current user to {@code epCtrl} and {@code bookingCtrl}.
      *
-     * @param email           student email
-     * @param password        student password
-     * @param view            the view to supply credentials through
-     * @param epCtrl          the EventsPerformanceController to sync
-     * @param bookingCtrl     the BookingController to sync
+     * @param email       student email
+     * @param password    student password
+     * @param view        the view to supply credentials through
+     * @param epCtrl      the EventPerformanceController to sync
+     * @param bookingCtrl the BookingController to sync
      */
     protected void loginAsStudent(String email, String password, TestView view,
-                                   EventsPerformanceController epCtrl,
+                                   EventPerformanceController epCtrl,
                                    BookingController bookingCtrl) {
-        // Reset to guest state without triggering error messages
         userController.setCurrentUser(null);
         epCtrl.setCurrentUser(null);
         bookingCtrl.setCurrentUser(null);
@@ -181,18 +166,18 @@ public abstract class TestSystemBase {
     }
 
     /**
-     * Resets all controllers to guest state, then logs in as the entertainment
-     * provider with the given credentials and propagates the current user to all
-     * controllers.
+     * Resets all controllers to guest state, logs in as the given entertainment
+     * provider, and propagates the current user to {@code epCtrl} and
+     * {@code bookingCtrl}.
      *
-     * @param email           EP email
-     * @param password        EP password
-     * @param view            the view to supply credentials through
-     * @param epCtrl          the EventsPerformanceController to sync
-     * @param bookingCtrl     the BookingController to sync
+     * @param email       EP email
+     * @param password    EP password
+     * @param view        the view to supply credentials through
+     * @param epCtrl      the EventPerformanceController to sync
+     * @param bookingCtrl the BookingController to sync
      */
     protected void loginAsEP(String email, String password, TestView view,
-                              EventsPerformanceController epCtrl,
+                              EventPerformanceController epCtrl,
                               BookingController bookingCtrl) {
         userController.setCurrentUser(null);
         epCtrl.setCurrentUser(null);
@@ -204,5 +189,27 @@ public abstract class TestSystemBase {
         User user = userController.getCurrentUser();
         epCtrl.setCurrentUser(user);
         bookingCtrl.setCurrentUser(user);
+    }
+
+    /**
+     * Resets all controllers to guest state and logs in as the admin staff
+     * member with the given credentials. Only syncs {@code userController} and
+     * {@code epController} since admin actions go through {@code epController}.
+     *
+     * @param email    admin email
+     * @param password admin password
+     * @param view     the view to supply credentials through
+     */
+    protected void loginAsAdmin(String email, String password, TestView view) {
+        userController.setCurrentUser(null);
+        epController.setCurrentUser(null);
+        bookingController.setCurrentUser(null);
+
+        view.addInputs(email, password);
+        userController.login();
+
+        User user = userController.getCurrentUser();
+        epController.setCurrentUser(user);
+        bookingController.setCurrentUser(user);
     }
 }

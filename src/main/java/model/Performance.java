@@ -3,7 +3,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 public class Performance {
-    private long performanceID;
+    private long performanceId;
     private LocalDateTime startDateTime;
     private LocalDateTime endDateTime;
     private ArrayList<String> performerNames;
@@ -20,8 +20,8 @@ public class Performance {
     private ArrayList<String> reviewComments;
     private PerformanceStatus status;
 
-    public long getPerformanceID(Performance perfomance){
-        return performanceID;
+    public long getPerformanceId(){
+        return performanceId;
     }
 
     public void cancel(){

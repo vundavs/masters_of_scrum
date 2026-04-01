@@ -7,7 +7,7 @@ public class Event {
     private EventType type;
     private boolean isTicketed;
 
-    public long getEventID(Event event){return eventID;}
+    public long getEventID(){return eventID;}
     public String getTitle(){return title;}
     public EventType getType(){return type;}
     public boolean isTicketed(){return isTicketed;}
