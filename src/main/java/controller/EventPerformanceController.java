@@ -3,6 +3,8 @@ package controller;
 import model.Performance;
 import view.View;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -26,35 +28,52 @@ public class EventPerformanceController extends Controller {
     }
 
     /**
-     * Handles the search for performances use case.
-     * TODO: implement full search logic.
+     * Handles the search for performances by date use case.
      */
     public void searchForPerformances() {
-        // TODO: implement search for performances
-        view.displayError("Search for performances not yet implemented.");
+        LocalDate date searchDateTime = (LocalDateTime) view.getInput("Enter date to search for performances");
+        for (Event e : events) {
+            Collection<String> results = e.getInfoOfPerformancesOnDate(LocalDateTime searchDateTime);
+            for (String s : results) {
+                System.out.println(s);
+            }
+        }
     }
 
     /**
      * Handles the view performance use case.
-     * TODO: implement full view logic.
      */
     public void viewPerformance() {
-        // TODO: implement view performance
-        view.displayError("View performance not yet implemented.");
+        long performanceID = (long) view.getInput("Enter performance ID to view: ");
+        Performance p = getPerformanceByID(performanceID);
+        if (p == null) {
+            view.displayError("Performance not found.");
+            return;
+        }
+        System.out.println(p.toString());
     }
 
     /**
      * Handles the create event use case for entertainment providers.
-     * TODO: implement full creation logic.
      */
-    public void createEvent() {
-        // TODO: implement create event
-        view.displayError("Create event not yet implemented.");
+    public Event createEvent() {
+        if(!checkCurrentUserIsEntertainmentProvider()) {
+            view.displayError("Only entertainment providers can create events.");
+            return null;
+        }
+        String title = (String) view.getInput("Enter event title: ");
+        EventType type = (EventType) view.getInput("Enter event type: ");
+        boolean isTicketed = (boolean) view.getInput("Is the event ticketed? (true/false)");
+
+        EntertainmentProvider organiser = (EntertainmentProvider) getCurrentUser();
+        Event e = new Event(title, type, isTicketed, organiser);
+        events.add(e);
+        return e;
     }
 
     /**
      * Handles the cancel performance use case for entertainment providers.
-     * TODO: implement full cancellation logic.
+     * TODO: paste in from sahasra
      */
     public void cancelPerformance() {
         // TODO: implement cancel performance
@@ -63,10 +82,52 @@ public class EventPerformanceController extends Controller {
 
     /**
      * Handles the sponsor performance use case for admin staff.
-     * TODO: implement full sponsorship logic.
      */
     public void sponsorPerformance() {
-        // TODO: implement sponsor performance
-        view.displayError("Sponsor performance not yet implemented.");
+        if(!checkCurrentUserIsAdmin()) {
+            view.displayError("Only admin staff can sponsor performances.");
+            return;
+        }
+
+        long performanceID = (long) view.getInput("Enter performance ID to sponsor: ");
+        Performance p = getPerformanceByID(performanceID);
+
+        if (p == null) {
+            view.displayError("Performance not found.");
+            return;
+        }
+
+        double amount = (double) view.getInput("Enter sponsorship amount: ");
+
+        if (!checkIfSponsorshipPossible(Performance p, int amount)) {
+            view.displayError("Sponsorship amount exceeds ticket price.");
+            return;
+        }
+
+        if(getIsSponsored()) {
+            view.displayError("Performance has already been sponsored.");
+            return;
+        }
+
+        p.sponsor(amount);
+        System.out.println("Performance sponsored successfully.");
+    }
+    }
+
+
+    private boolean checkIfSponsorshipPossible(Performance performance, int amount) {
+        return (amount <= performance.getTicketPrice();
+    }
+
+
+    /**
+     * overrides java's toString() method for better formatting
+     *
+     * @return string in correct format
+     */
+    @Override
+    public String toString() {
+        return "Performance{id=" + performanceID + ", venue='" + venueAddress +
+                "', start=" + startDateTime + ", status=" + status + "}";
     }
 }
