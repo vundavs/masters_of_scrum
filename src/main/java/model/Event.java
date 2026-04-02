@@ -13,6 +13,9 @@ public class Event {
     private String title;
     private EventType type;
     private boolean isTicketed;
+    private EntertainmentProvider organiser;
+    private ArrayList<Performance> performances;
+
 
     /**
      * Creates an new event with the given details
@@ -21,14 +24,17 @@ public class Event {
      * @param type          what type of event it is
      * @param isTicketed    whether or not the event is ticketed
      */
-    public Event (String title, EventType type, boolean isTicketed) {
+    public Event (String title, EventType type, boolean isTicketed, EntertainmentProvider organiser) {
         assert title != null : "Title cannot be null";
         assert type != null : "Type cannot be null";
+        assert organiser != null : "Organiser cannot be null";
 
         this.eventID = nextEventId++;
         this.title = title;
         this.type = type;
         this.isTicketed = isTicketed;
+        this.organiser = organiser;
+        this.performances = new ArrayList<>();
     }
 
     /**
@@ -138,8 +144,13 @@ public class Event {
         return getOrgName();
     }
 
+    /**
+     * gets the event organiser/EP's email
+     *
+     * @return organiser's email
+     */
     public String getOrganiserEmail(){
-
+        return organiser.getEmail();
     }
 
     /**
@@ -195,6 +206,9 @@ public class Event {
         return false;
     }
 
+    /**
+     * add a perfromance
+     */
     private void addPerformance(p:Performance){
         performances.add(p)
     }
