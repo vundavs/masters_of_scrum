@@ -1,6 +1,5 @@
 package controller;
 
-import jdk.vm.ci.meta.Local;
 import model.Performance;
 import view.View;
 
@@ -13,17 +12,17 @@ import java.util.List;
  * search for performances, view performance, create event,
  * cancel performance, and sponsor performance.
  */
-public class EventsPerformanceController extends Controller {
+public class EventPerformanceController extends Controller {
 
     private final List<Performance> performances;
 
     /**
-     * Creates a new EventsPerformanceController.
+     * Creates a new EventPerformanceController.
      *
      * @param view         the view for user interaction
      * @param performances shared list of all performances
      */
-    public EventsPerformanceController(View view, List<Performance> performances) {
+    public EventPerformanceController(View view, List<Performance> performances) {
         this.view = view;
         this.performances = performances;
     }
