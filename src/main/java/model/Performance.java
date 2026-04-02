@@ -1,5 +1,6 @@
 package model;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 
 public class Performance {
@@ -19,6 +20,8 @@ public class Performance {
     private Collection<Integer> reviewRatings;
     private Collection<String> reviewComments;
     private PerformanceStatus status;
+
+    private Event event;
 
     /**
      * Returns the unique performance ID.
@@ -164,13 +167,14 @@ public class Performance {
         return status;
     }
 
+    //METHODS
+
     /**
      * Cancels this performance and changes status
      */
     public void cancel(){
         this.status = PerformanceStatus.CANCELLED;
     }
-
 
     /**
      * checks if the event is ticketed
@@ -188,9 +192,7 @@ public class Performance {
      */
     public boolean checkIfTicketsLeft(int numTicketsToBuy){
         assert numTicketsToBuy > 0 : "Number of tickets to buy must be greater than 0";
-        int ticketsLeft;
-        ticketsLeft = getNumTicketsTotal() - getNumTicketsSold() - numTicketsToBuy;
-        if (ticketsLeft >= 0){
+        if (getNumTicketsTotal() - getNumTicketsSold() - numTicketsToBuy >= 0){
             return true;
         }
         return false;
@@ -209,49 +211,83 @@ public class Performance {
     }
 
     /**
+     * gets the organiser/EP's email
      *
-     * @return
+     * @return organiser's email
      */
     public String getOrganiserEmail(){
-        return organiser.getUser().getEmail();
-                //DK IF MATCHES - organiser?
+        return event.getOrganiserEmail();
     }
 
+    /**
+     * gets the event titls
+     *
+     * @return event title
+     */
     public String getEventTitle(){
         return event.getTitle();
     }
 
+    /**
+     * checks if the event has already happend
+     *
+     * @return if event has already started
+     */
     public boolean checkHasNotHappenedYet(){
         return startDateTime.isAfter(LocalDateTime.now());
     }
 
+
+    /**
+     * checks if the performance was made by an EP
+     *
+     * @param email     the email of creator of performance
+     *
+     * @return whether event was created by an EP
+     */
     public boolean checkCreatedByEP(String email){
-        //
-        for (EntertainmentProvider e : entertainmentProvider){
-            if (e.getUser().getEmail().equals(email)){
-                //if email belongs to an EP
+        return event.getOrganiserEMail().equals(email);
+    }
+
+    /**
+     * checks if a perfomance has any active bookings
+     *
+     * @return whether an event has any active bookings
+     */
+    public boolean hasActiveBookings(){
+        for(Booking b: bookings){
+            if (b.getStatus() != BookingStatus.CANCELLED){
                 return true;
             }
         }
         return false;
     }
 
-    public boolean hasActiveBookings(){
-        if (numTicketsTotal > 0){
-            return true;
-        }
-        return false;
-    }
-
     public String getBookingDetailsForRefund(){
-        //NOT SURE IF THIS IS CORRECT
-        return getBookingDetailsRefund();
+        StringBuilder result = new StringBuilder();
+        for (Booking b : bookings) {
+            if (b.getStatus() != BookingStatus.CANCELLED) {
+                result.append(b.generateBookingRecord()).append("\n");
+            }
+        }
+        return result.toString();
     }
 
     //check if already sponsored
     //JUSTIFY: a performance can only be sponsored once
+
+    /**
+     * sponsor event
+     *
+     * @param amount    amount admin would like to sponsor by
+     */
     public void sponsor(double amount){
-        if (sponsoredAmount > ticketPrice){
+        if(getIsSponsored()){
+            System.out.println("Event has aleready been sponsored");
+            return;
+        }
+
+        if (amount > ticketPrice){
             System.out.println("Sponsored amount is greater than ticket price");
         } else {
             isSponsored = true;
@@ -259,13 +295,37 @@ public class Performance {
         }
     }
 
+    /**
+     * add review and its comment
+     *
+     * @param rating    review number rating
+     * @param comment   review comment
+     */
     public void review(int rating, String comment){
          reviewRatings.add(rating);
          reviewComments.add(comment);
     }
 
+    /**
+     * adds a booking
+     *
+     * @param b the booking
+     */
     public void addBooking(Booking b){
-
+        bookings.add(b);
+        numTicketsSold += b.getNumTickets();
     }
+
+    /**
+     * overrides java's toString() method for better formatting
+     *
+     * @return string in correct format
+     */
+    @Override
+    public String toString() {
+        return "Event{id=" + eventID + ", title='" + title + "', type=" + type +
+                ", ticketed=" + isTicketed + "}";
+    }
+
 }
 
