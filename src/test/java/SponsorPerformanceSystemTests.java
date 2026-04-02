@@ -1,48 +1,78 @@
-import model.*;
-import controller.*;
-import external.*;
-import org.junit.jupiter.api.BeforeEach;
+import model.EntertainmentProvider;
+import model.Performance;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-import java.time.LocalDateTime;
 
-public class SponsorPerformanceSystemTests {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-    private EventPerformanceController epController;
-    private TextUserInterface mockUI;
-    private Performance testPerformance;
+/**
+ * System tests for the Sponsor Performance use case.
+ */
+public class SponsorPerformanceSystemTests extends TestSystemBase {
 
-    @BeforeEach
-    public void setUp() {
-        mockUI = mock(TextUserInterface.class);
-        
-        epController = new EventPerformanceController();
+    @Test
+    void testSponsorPerformanceSuccessfully() {
+        TestView view = new TestView();
+        initControllers(view);
 
+        EntertainmentProvider ep = registerEP(view);
+        Performance p = createFuturePerformance(ep);
 
-        Event testEvent = new Event(1L, "Spring Concert", EventType.MUSIC, true);
+        loginAsAdmin("admin@uni.ac.uk", "adminpass", view);
+        view.addInputs(String.valueOf(p.getPerformanceId()), "25.0");
+        epController.sponsorPerformance();
 
-        testPerformance = new Performance(101L, LocalDateTime.now().plusDays(5), 
-                                          LocalDateTime.now().plusDays(5).plusHours(2), 
-                                          null, "Main Hall", 100, false, false, 100, 0, 50.0);
-
-        testEvent.addPerformance(testPerformance);
-        epController.addEvent(testEvent);
-        epController.addPerformance(testPerformance);
+        assertTrue(p.isSponsored(),
+                "Performance should be marked as sponsored");
+        assertEquals(25.0, p.getSponsoredAmount(),
+                "Sponsored amount should be updated to 25.0");
+        assertTrue(view.hasSuccessContaining("Successful"),
+                "Success message should be displayed");
     }
 
     @Test
-    public void testSponsorPerformance_Success() {
+    void testSponsorPerformanceFailsWhenNotLoggedIn() {
+        TestView view = new TestView();
+        initControllers(view);
 
-        when(mockUI.getInput(anyString()))
-            .thenReturn("101")   // Simulates typing the performance ID
-            .thenReturn("25.0"); // Simulates typing the valid sponsorship amount
+        EntertainmentProvider ep = registerEP(view);
+        Performance p = createFuturePerformance(ep);
 
+        view.addInputs(String.valueOf(p.getPerformanceId()), "25.0");
         epController.sponsorPerformance();
 
-        assertTrue(testPerformance.isSponsored(), "The performance should be marked as sponsored.");
-        assertEquals(25.0, testPerformance.getSponsoredAmount(), "The sponsored amount should be updated to 25.0.");
-        
-        verify(mockUI).displaySuccess("Sponsorship Successful!");
+        assertTrue(view.hasErrorContaining("admin"),
+                "Error should state that admin must be logged in");
+    }
+
+    @Test
+    void testSponsorPerformanceFailsWhenStudentLoggedIn() {
+        TestView view = new TestView();
+        initControllers(view);
+
+        EntertainmentProvider ep = registerEP(view);
+        Performance p = createFuturePerformance(ep);
+
+        loginAsStudent("student1@uni.ac.uk", "pass1", view, epController, bookingController);
+        view.addInputs(String.valueOf(p.getPerformanceId()), "25.0");
+        epController.sponsorPerformance();
+
+        assertTrue(view.hasErrorContaining("admin"),
+                "Error should state that admin must be logged in");
+    }
+
+    @Test
+    void testSponsorPerformanceFailsForNonExistentId() {
+        TestView view = new TestView();
+        initControllers(view);
+
+        registerEP(view);
+        loginAsAdmin("admin@uni.ac.uk", "adminpass", view);
+
+        view.addInputs("99999", "25.0");
+        epController.sponsorPerformance();
+
+        assertTrue(view.hasErrorContaining("does not exist"),
+                "Error should state that the performance does not exist");
     }
 }

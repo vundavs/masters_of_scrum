@@ -135,7 +135,7 @@ public class UserController extends Controller {
      *
      * @param user the user to add
      */
-    private void addUser(User user) {
+    public void addUser(User user) {
         users.add(user);
         return;
     }
