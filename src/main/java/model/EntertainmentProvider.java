@@ -112,4 +112,13 @@ public class EntertainmentProvider extends User {
     public void addEvent(Event event) {
         events.add(event);
     }
+
+    /**
+     * Gets the list of events owned by this provider.
+     *
+     * @return the list of events
+     */
+    public ArrayList<Event> getEvents() {
+        return events;
+    }
 }
