@@ -311,26 +311,14 @@ public class Performance {
         return result.toString();
     }
 
-    //check if already sponsored
-    //JUSTIFY: a performance can only be sponsored once
-
     /**
      * sponsor event
      *
      * @param amount    amount admin would like to sponsor by
      */
     public void sponsor(double amount){
-        if(getIsSponsored()){
-            System.out.println("Event has aleready been sponsored");
-            return;
-        }
-
-        if (amount > ticketPrice){
-            System.out.println("Sponsored amount is greater than ticket price");
-        } else {
             isSponsored = true;
             sponsoredAmount = amount;
-        }
     }
 
     /**
@@ -361,8 +349,8 @@ public class Performance {
      */
     @Override
     public String toString() {
-        return "Event{id=" + eventID + ", title='" + title + "', type=" + type +
-                ", ticketed=" + isTicketed + "}";
+        return "Performance{id=" + performanceID + ", venue='" + venueAddress +
+                "', start=" + startDateTime + ", status=" + status + "}";
     }
 
 }
