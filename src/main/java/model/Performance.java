@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class Performance {
+    private static long nextPerformanceID = 1;
+
     private long performanceID;
     private LocalDateTime startDateTime;
     private LocalDateTime endDateTime;
@@ -22,6 +24,42 @@ public class Performance {
     private PerformanceStatus status;
 
     private Event event;
+
+    /**
+     * creates a new performance with the given details
+     *
+     * @param startDateTime         start time and date of the event
+     * @param endDateTime           end time and dtae of the event
+     * @param performerNames        all performer's names
+     * @param venueAddress          address of the venue
+     * @param venueCapacity         capacity of the venue
+     * @param venueIsOutdoors       whether the venue is outdoors or not
+     * @param venueAllowsSmoking    if the venue allows smoking
+     * @param numTicketsTotal       number of tickets to be put on sale
+     * @param ticketPrice           price of the ticket
+     * @param event                 the event the performance belongs to
+     */
+    public Performance(LocalDateTime startDateTime, LocalDateTime endDateTime,
+                       Collection<String> performerNames, String venueAddress, int venueCapacity,
+                       boolean venueIsOutdoors, boolean venueAllowsSmoking, int numTicketsTotal,
+                       double ticketPrice, Event event) {
+        assert venueAddress != null : "Venue address cannot be null";
+        assert venueCapacity > 0 : "Venue capacity must be greater than 0";
+        assert numTicketsTotal <= venueCapacity : "Number of tickets must be less than or equal to venueCapacity";
+
+        this.performanceId = nextPerformanceID++;
+        this.startDateTime = startDateTime;
+        this.endDateTime = endDateTime;
+        this.performerNames = performerNames;
+        this.venueAddress = venueAddress;
+        this.venueCapacity = venueCapacity;
+        this.venueIsOutdoors = venueIsOutdoors;
+        this.venueAllowsSmoking = venueAllowsSmoking;
+        this.numTicketsTotal = numTicketsTotal;
+        this.ticketPrice = ticketPrice;
+        this.status = PerformanceStatus.ACTIVE;
+        this.event = event;
+    }
 
     /**
      * Returns the unique performance ID.
