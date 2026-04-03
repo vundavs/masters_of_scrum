@@ -4,6 +4,9 @@ import external.PaymentSystem;
 import external.VerificationService;
 import model.*;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +24,10 @@ public class UserController extends Controller {
     private final PaymentSystem paymentSystem;
     private final VerificationService verificationService;
 
+    private static final String PREREGISTERED_USERS_FILE_PATH = "src/main/resources/preregistered_users.csv";
+    private static final String PREREGISTERED_ADMIN_FILE_PATH = "src/main/resources/preregistered_admins.csv";
+
+
     /**
      * Creates a new EventsApp instance.
      *
@@ -30,6 +37,7 @@ public class UserController extends Controller {
     public UserController(PaymentSystem paymentSystem, VerificationService verificationService) {
         this.paymentSystem = paymentSystem;
         this.verificationService = verificationService;
+        addPreregisteredUsers();
     }
 
     /**
@@ -135,7 +143,7 @@ public class UserController extends Controller {
      *
      * @param user the user to add
      */
-    private void addUser(User user) {
+    public void addUser(User user) {
         users.add(user);
         return;
     }
@@ -161,6 +169,69 @@ public class UserController extends Controller {
         return;
     }
 
+    /**
+     * Reads preregistered students and admin staff from CSV files
+     * and adds them to the system's user list.
+     */
+    private void addPreregisteredUsers() {
+        try (BufferedReader reader = new BufferedReader(
+                new FileReader(PREREGISTERED_USERS_FILE_PATH))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] fields = line.split(",");
+                if (fields.length == 4) {
+                    String email = fields[0].trim();
+                    String password = fields[1].trim();
+                    String name = fields[2].trim();
+                    int phoneNumber = Integer.parseInt(fields[3].trim());
+                    addUser(new Student(email, password, name, phoneNumber));
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Failed to load preregistered users: "
+                    + e.getMessage());
+        } catch (NumberFormatException e) {
+            System.err.println("Invalid phone number in users file: "
+                    + e.getMessage());
+        }
 
+        try (BufferedReader reader = new BufferedReader(
+                new FileReader(PREREGISTERED_ADMIN_FILE_PATH))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] fields = line.split(",");
+                if (fields.length == 3) {
+                    String email = fields[0].trim();
+                    String password = fields[1].trim();
+                    String name = fields[2].trim();
+                    addUser(new AdminStaff(email, password, name));
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Failed to load preregistered admins: "
+                    + e.getMessage());
+        }
+    }
+
+    /**
+     * Finds the entertainment provider who owns the event with the given number.
+     *
+     * @param eventNumber the ID of the event to search for
+     * @return the EntertainmentProvider who owns the event, or null if not found
+     */
+    private EntertainmentProvider getEntertainmentProviderOwningEvent(long eventNumber) {
+        for (User user : users) {
+            if (user instanceof EntertainmentProvider) {
+                EntertainmentProvider ep = (EntertainmentProvider) user;
+
+                for (Event event : ep.getEvents()) {
+                    if (event.getEventID() == eventNumber) {
+                        return ep;
+                    }
+                }
+            }
+        }
+        return null;
+    }
 
 }
