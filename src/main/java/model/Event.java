@@ -3,6 +3,7 @@ package model;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public class Event {
 
@@ -82,7 +83,7 @@ public class Event {
      * @return the performance added
      */
     public Performance createPerformance(long performanceID, LocalDateTime startDateTime, LocalDateTime endDateTime,
-                                         Collection<String> performerNames,
+                                         List<String> performerNames,
                                          String venueAddress, int venueCapacity, boolean venueIsOutdoors,
                                          boolean venueAllowsSmoking, int numTickets, double ticketPrice) {
         assert performerNames != null : "PerformerNames cannot be null";
@@ -95,7 +96,7 @@ public class Event {
         assert ticketPrice > 0 : "Ticket price cannot be negative";
 
 
-        Performance p = new Performance(performanceID, startDateTime, endDateTime,
+        Performance p = new Performance(startDateTime, endDateTime,
                 performerNames, venueAddress, venueCapacity, venueIsOutdoors,
                 venueAllowsSmoking, numTickets, ticketPrice, this);
         performances.add(p);
@@ -110,7 +111,7 @@ public class Event {
      */
     public Performance getPerformanceByID(long performanceID) {
         for (Performance p : performances){
-            if (p.getPerformanceID() == performanceID){
+            if (p.getPerformanceId() == performanceID){
                 return p;
             }
         }
@@ -127,7 +128,7 @@ public class Event {
     public Collection<String> getInfoOfPerformancesOnDate(LocalDateTime searchDateTime){
         Collection<String> result = new ArrayList<>();
         for (Performance p : performances){
-            if (p.getStartDateTime().toLocalDate().equals(searchDateTime.toLocalDate)){
+            if (p.getStartDateTime().toLocalDate().equals(searchDateTime.toLocalDate())){
                 result.add(p.toString());
             }
         }
@@ -140,7 +141,7 @@ public class Event {
      * @return organiser's name
      */
     private String getOrganiserName(){
-        return getOrgName();
+        return organiser.getOrgName();
     }
 
     /**
@@ -208,8 +209,8 @@ public class Event {
     /**
      * add a perfromance
      */
-    private void addPerformance(p:Performance){
-        performances.add(p)
+    public void addPerformance(Performance p){
+        performances.add(p);
     }
 
     /**
