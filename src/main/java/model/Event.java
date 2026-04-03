@@ -1,5 +1,4 @@
 package model;
-import jdk.jfr.EventType;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -110,7 +109,7 @@ public class Event {
      * @return the perfomance that matches ID
      */
     public Performance getPerformanceByID(long performanceID) {
-        for (Performace p : performances){
+        for (Performance p : performances){
             if (p.getPerformanceID() == performanceID){
                 return p;
             }

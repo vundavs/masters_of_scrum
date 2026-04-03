@@ -61,6 +61,15 @@ public abstract class Controller {
     }
 
     /**
+     * Sets the view used by this controller for input and output.
+     *
+     * @param view the view to use
+     */
+    public void setView(View view) {
+        this.view = view;
+    }
+
+    /**
      * Returns the current logged-in user.
      *
      * @return the current user, or null if not logged in
