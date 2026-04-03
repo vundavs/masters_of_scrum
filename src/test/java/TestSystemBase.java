@@ -111,7 +111,7 @@ public abstract class TestSystemBase {
                 LocalDateTime.now().plusDays(7).plusHours(2),
                 List.of("Band"),
                 "Main Hall", 200, false, false, 100, 20.0,
-                event);
+                new ArrayList<>(), event);
         performances.add(p);
         event.addPerformance(p);
         return p;
@@ -134,7 +134,7 @@ public abstract class TestSystemBase {
                 LocalDateTime.now().minusDays(7).plusHours(2),
                 List.of("Band"),
                 "Main Hall", 200, false, false, 100, 20.0,
-                event);
+                new ArrayList<>(), event);
         performances.add(p);
         event.addPerformance(p);
         return p;

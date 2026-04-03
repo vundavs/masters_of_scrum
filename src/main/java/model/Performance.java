@@ -24,7 +24,6 @@ public class Performance {
     private PerformanceStatus status;
     private List<Booking> bookings;
 
-    private List<Booking> bookings;
     private Event event;
 
     /**
