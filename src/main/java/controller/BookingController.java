@@ -41,7 +41,6 @@ public class BookingController extends Controller {
      * Gets performance ID and ticket count, processes payment, creates a booking.
      */
     public void bookPerformance() {
-        assert checkCurrentUserIsStudent() : "Must be logged in as a student";
         if (!checkCurrentUserIsStudent()) {
             view.displayError("You must be logged in as a student to book.");
             return;
@@ -123,7 +122,6 @@ public class BookingController extends Controller {
      * Gets booking number from user, processes refund, cancels booking.
      */
     public void cancelBooking() {
-        assert checkCurrentUserIsStudent() : "Must be logged in as a student";
         if (!checkCurrentUserIsStudent()) {
             view.displayError("You must be logged in as a student.");
             return;
@@ -182,7 +180,6 @@ public class BookingController extends Controller {
      * Student must have an active booking for a past performance.
      */
     public void reviewPerformance() {
-        assert checkCurrentUserIsStudent() : "Must be logged in as a student";
         if (!checkCurrentUserIsStudent()) {
             view.displayError("You must be logged in as a student.");
             return;
