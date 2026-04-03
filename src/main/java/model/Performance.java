@@ -1,15 +1,15 @@
 package model;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
 public class Performance {
-    private static long nextPerformanceID = 1;
+    private static long nextPerformanceId = 1;
 
-    private long performanceID;
+    private long performanceId;
     private LocalDateTime startDateTime;
     private LocalDateTime endDateTime;
-    private Collection<String> performerNames;
+    private List<String> performerNames;
     private String venueAddress;
     private int venueCapacity;
     private boolean venueIsOutdoors;
@@ -19,10 +19,11 @@ public class Performance {
     private double ticketPrice;
     private boolean isSponsored;
     private double sponsoredAmount;
-    private Collection<Integer> reviewRatings;
-    private Collection<String> reviewComments;
+    private List<Integer> reviewRatings = new ArrayList<>();
+    private List<String> reviewComments = new ArrayList<>();
     private PerformanceStatus status;
 
+    private List<Booking> bookings;
     private Event event;
 
     /**
@@ -40,14 +41,15 @@ public class Performance {
      * @param event                 the event the performance belongs to
      */
     public Performance(LocalDateTime startDateTime, LocalDateTime endDateTime,
-                       Collection<String> performerNames, String venueAddress, int venueCapacity,
+                       List<String> performerNames, String venueAddress, int venueCapacity,
                        boolean venueIsOutdoors, boolean venueAllowsSmoking, int numTicketsTotal,
-                       double ticketPrice, Event event) {
+                       double ticketPrice, List<Booking> bookings, Event event) {
         assert venueAddress != null : "Venue address cannot be null";
+        assert endDateTime.isAfter(startDateTime) : "End time must be after start time";
         assert venueCapacity > 0 : "Venue capacity must be greater than 0";
         assert numTicketsTotal <= venueCapacity : "Number of tickets must be less than or equal to venueCapacity";
 
-        this.performanceId = nextPerformanceID++;
+        this.performanceId = nextPerformanceId++;
         this.startDateTime = startDateTime;
         this.endDateTime = endDateTime;
         this.performerNames = performerNames;
@@ -58,16 +60,17 @@ public class Performance {
         this.numTicketsTotal = numTicketsTotal;
         this.ticketPrice = ticketPrice;
         this.status = PerformanceStatus.ACTIVE;
+        this.bookings = new ArrayList<>();
         this.event = event;
     }
 
     /**
-     * Returns the unique performance ID.
+     * Returns the unique performance Id.
      *
-     * @return performance ID
+     * @return performance Id
      */
-    public long getPerformanceID(){
-        return performanceID;
+    public long getPerformanceId(){
+        return performanceId;
     }
 
     /**
@@ -93,7 +96,7 @@ public class Performance {
      *
      * @return performers names
      */
-    public Collection<String> getPerformerNames() {
+    public List<String> getPerformerNames() {
         return performerNames;
     }
 
@@ -183,7 +186,7 @@ public class Performance {
      *
      * @return all review ratings
      */
-    public Collection<Integer> getReviewRatings() {
+    public List<Integer> getReviewRatings() {
         return reviewRatings;
     }
 
@@ -192,7 +195,7 @@ public class Performance {
      *
      * @return all review comments
      */
-    public Collection<String> getReviewComments() {
+    public List<String> getReviewComments() {
         return reviewComments;
     }
 
@@ -284,7 +287,7 @@ public class Performance {
      * @return whether event was created by an EP
      */
     public boolean checkCreatedByEP(String email){
-        return event.getOrganiserEMail().equals(email);
+        return event.getOrganiserEmail().equals(email);
     }
 
     /**
@@ -317,8 +320,8 @@ public class Performance {
      * @param amount    amount admin would like to sponsor by
      */
     public void sponsor(double amount){
-            isSponsored = true;
-            sponsoredAmount = amount;
+        isSponsored = true;
+        sponsoredAmount = amount;
     }
 
     /**
@@ -328,8 +331,8 @@ public class Performance {
      * @param comment   review comment
      */
     public void review(int rating, String comment){
-         reviewRatings.add(rating);
-         reviewComments.add(comment);
+        reviewRatings.add(rating);
+        reviewComments.add(comment);
     }
 
     /**
@@ -349,9 +352,8 @@ public class Performance {
      */
     @Override
     public String toString() {
-        return "Performance{id=" + performanceID + ", venue='" + venueAddress +
+        return "Performance{id=" + performanceId + ", venue='" + venueAddress +
                 "', start=" + startDateTime + ", status=" + status + "}";
     }
 
 }
-
