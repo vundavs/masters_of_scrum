@@ -107,11 +107,11 @@ public abstract class TestSystemBase {
         ep.addEvent(event);
 
         Performance p = new Performance(
-                event,
                 LocalDateTime.now().plusDays(7),
                 LocalDateTime.now().plusDays(7).plusHours(2),
                 List.of("Band"),
-                "Main Hall", 200, false, false, 100, 20.0);
+                "Main Hall", 200, false, false, 100, 20.0,
+                event);
         performances.add(p);
         event.addPerformance(p);
         return p;
@@ -130,11 +130,11 @@ public abstract class TestSystemBase {
         ep.addEvent(event);
 
         Performance p = new Performance(
-                event,
                 LocalDateTime.now().minusDays(7),
                 LocalDateTime.now().minusDays(7).plusHours(2),
                 List.of("Band"),
-                "Main Hall", 200, false, false, 100, 20.0);
+                "Main Hall", 200, false, false, 100, 20.0,
+                event);
         performances.add(p);
         event.addPerformance(p);
         return p;
