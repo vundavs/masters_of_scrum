@@ -22,8 +22,8 @@ public class Performance {
     private List<Integer> reviewRatings = new ArrayList<>();
     private List<String> reviewComments = new ArrayList<>();
     private PerformanceStatus status;
-
     private List<Booking> bookings;
+
     private Event event;
 
     /**
@@ -297,7 +297,7 @@ public class Performance {
      */
     public boolean hasActiveBookings(){
         for(Booking b: bookings){
-            if (b.getStatus() != BookingStatus.CANCELLED){
+            if (b.getStatus() == BookingStatus.ACTIVE){
                 return true;
             }
         }
@@ -307,7 +307,7 @@ public class Performance {
     public String getBookingDetailsForRefund(){
         StringBuilder result = new StringBuilder();
         for (Booking b : bookings) {
-            if (b.getStatus() != BookingStatus.CANCELLED) {
+            if (b.getStatus() == BookingStatus.ACTIVE) {
                 result.append(b.generateBookingRecord()).append("\n");
             }
         }

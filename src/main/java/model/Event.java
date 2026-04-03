@@ -98,7 +98,7 @@ public class Event {
 
         Performance p = new Performance(startDateTime, endDateTime,
                 performerNames, venueAddress, venueCapacity, venueIsOutdoors,
-                venueAllowsSmoking, numTickets, ticketPrice, this);
+                venueAllowsSmoking, numTickets, ticketPrice, new ArrayList<>(), this);
         performances.add(p);
         return p;
     }
