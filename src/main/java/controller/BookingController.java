@@ -279,4 +279,42 @@ public class BookingController extends Controller {
         }
         return null;
     }
+
+    /**
+     * Adds a booking to the shared bookings list.
+     *
+     * @param b the booking to add
+     */
+    private void addBooking(Booking b) {
+        bookings.add(b);
+    }
+
+    /**
+     * Checks whether a booking is possible for the given performance and ticket count.
+     *
+     * @param performance the performance to check
+     * @param numTickets  the number of tickets requested
+     * @return true if the performance is ticketed and has enough tickets left
+     */
+    private boolean checkIfBookingPossible(Performance performance, int numTickets) {
+        return performance.checkIfEventIsTicketed()
+                && performance.checkIfTicketsLeft(numTickets);
+    }
+
+    /**
+     * Finds all bookings associated with the given event ID.
+     *
+     * @param eventID the event ID to search for
+     * @return a collection of matching bookings
+     */
+    private java.util.Collection<Booking> findBookingsByEventID(long eventID) {
+        java.util.List<Booking> result = new java.util.ArrayList<>();
+        for (Booking b : bookings) {
+            if (b.getPerformance().getPerformanceId() == eventID) {
+                result.add(b);
+            }
+        }
+        return result;
+    }
 }
+
