@@ -90,11 +90,12 @@ public class BookPerformanceSystemTests extends TestSystemBase {
                 "Free Concert", model.EventType.MUSIC, false, ep);
         events.add(freeEvent);
         ep.addEvent(freeEvent);
-        Performance p = new Performance(freeEvent,
+        Performance p = new Performance(
                 java.time.LocalDateTime.now().plusDays(7),
                 java.time.LocalDateTime.now().plusDays(7).plusHours(2),
                 java.util.List.of("Band"),
-                "City Park", 500, true, false, 0, 0.0);
+                "City Park", 500, true, false, 0, 0.0,
+                java.util.List.of(), freeEvent);
         performances.add(p);
         freeEvent.addPerformance(p);
 
@@ -118,11 +119,12 @@ public class BookPerformanceSystemTests extends TestSystemBase {
         model.Event event = new model.Event("Tiny Gig", model.EventType.MUSIC, true, ep);
         events.add(event);
         ep.addEvent(event);
-        Performance p = new Performance(event,
+        Performance p = new Performance(
                 java.time.LocalDateTime.now().plusDays(7),
                 java.time.LocalDateTime.now().plusDays(7).plusHours(2),
                 java.util.List.of("Band"),
-                "Tiny Venue", 10, false, false, 2, 20.0);
+                "Tiny Venue", 10, false, false, 2, 20.0,
+                java.util.List.of(), event);
         performances.add(p);
         event.addPerformance(p);
 

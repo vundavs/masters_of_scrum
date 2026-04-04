@@ -46,6 +46,11 @@ public abstract class TestSystemBase {
     protected List<Booking> bookings;
     protected List<Event> events;
 
+    /** Pre-registered student 1 — email: {@code student1@uni.ac.uk}, password: {@code pass1} */
+    protected Student student1;
+    /** Pre-registered student 2 — email: {@code student2@uni.ac.uk}, password: {@code pass2} */
+    protected Student student2;
+
     /**
      * Initialises all controllers and shared collections with the given view.
      * Pre-registers two students and one admin staff member, and resets the
@@ -68,8 +73,10 @@ public abstract class TestSystemBase {
         bookingController = new BookingController(paymentSystem, view, performances, bookings);
 
         // Pre-register students and admin (not registered via the public EP flow)
-        userController.addUser(new Student("student1@uni.ac.uk", "pass1", "Alice", 111111111));
-        userController.addUser(new Student("student2@uni.ac.uk", "pass2", "Bob",   222222222));
+        student1 = new Student("student1@uni.ac.uk", "pass1", "Alice", 111111111);
+        student2 = new Student("student2@uni.ac.uk", "pass2", "Bob",   222222222);
+        userController.addUser(student1);
+        userController.addUser(student2);
         userController.addUser(new AdminStaff("admin@uni.ac.uk", "adminpass", "Admin User"));
 
         Booking.resetBookingNumberCounter();
@@ -107,11 +114,11 @@ public abstract class TestSystemBase {
         ep.addEvent(event);
 
         Performance p = new Performance(
-                event,
                 LocalDateTime.now().plusDays(7),
                 LocalDateTime.now().plusDays(7).plusHours(2),
                 List.of("Band"),
-                "Main Hall", 200, false, false, 100, 20.0);
+                "Main Hall", 200, false, false, 100, 20.0,
+                new ArrayList<>(), event);
         performances.add(p);
         event.addPerformance(p);
         return p;
@@ -130,11 +137,11 @@ public abstract class TestSystemBase {
         ep.addEvent(event);
 
         Performance p = new Performance(
-                event,
                 LocalDateTime.now().minusDays(7),
                 LocalDateTime.now().minusDays(7).plusHours(2),
                 List.of("Band"),
-                "Main Hall", 200, false, false, 100, 20.0);
+                "Main Hall", 200, false, false, 100, 20.0,
+                new ArrayList<>(), event);
         performances.add(p);
         event.addPerformance(p);
         return p;

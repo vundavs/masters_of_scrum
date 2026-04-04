@@ -20,10 +20,6 @@ public class CancelBookingSystemTests extends TestSystemBase {
         return bookings.get(0);
     }
 
-    // -----------------------------------------------------------------------
-    // Happy path
-    // -----------------------------------------------------------------------
-
     @Test
     void testCancelBookingSuccessfully() {
         // Books a performance then cancels it; expects CANCELLEDBYSTUDENT status
@@ -61,9 +57,7 @@ public class CancelBookingSystemTests extends TestSystemBase {
                 "Booking should not be ACTIVE after cancellation");
     }
 
-    // -----------------------------------------------------------------------
     // Authentication / authorisation failures
-    // -----------------------------------------------------------------------
 
     @Test
     void testCancelBookingFailsWhenNotLoggedIn() {
@@ -122,10 +116,8 @@ public class CancelBookingSystemTests extends TestSystemBase {
                 "Error should state that the booking does not belong to this student");
     }
 
-    // -----------------------------------------------------------------------
     // Invalid booking number
-    // -----------------------------------------------------------------------
-
+    
     @Test
     void testCancelBookingFailsForNonExistentBookingNumber() {
         // Booking number 99999 does not exist in the system.
@@ -158,9 +150,23 @@ public class CancelBookingSystemTests extends TestSystemBase {
                 "Error should state that the booking number is invalid");
     }
 
-    // -----------------------------------------------------------------------
+    @Test
+    void testCancelBookingFailsWhenAdminLoggedIn() {
+        // Admin staff are not allowed to cancel bookings.
+        TestView view = new TestView();
+        initControllers(view);
+
+        registerEP(view);
+
+        loginAsAdmin("admin@uni.ac.uk", "adminpass", view);
+        view.addInputs("1");
+        bookingController.cancelBooking();
+
+        assertTrue(view.hasErrorContaining("student"),
+                "Error should state that a student must be logged in");
+    }
+
     // Already-cancelled booking
-    // -----------------------------------------------------------------------
 
     @Test
     void testCancelBookingFailsWhenAlreadyCancelled() {

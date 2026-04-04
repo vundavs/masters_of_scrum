@@ -19,10 +19,10 @@ public class Performance {
     private double ticketPrice;
     private boolean isSponsored;
     private double sponsoredAmount;
-    private int[] reviewRatings;
-    private String[] reviewComments;
-
+    private List<Integer> reviewRatings = new ArrayList<>();
+    private List<String> reviewComments = new ArrayList<>();
     private PerformanceStatus status;
+    private List<Booking> bookings;
 
     private Event event;
 
@@ -43,8 +43,9 @@ public class Performance {
     public Performance(LocalDateTime startDateTime, LocalDateTime endDateTime,
                        List<String> performerNames, String venueAddress, int venueCapacity,
                        boolean venueIsOutdoors, boolean venueAllowsSmoking, int numTicketsTotal,
-                       double ticketPrice, Event event) {
+                       double ticketPrice, List<Booking> bookings, Event event) {
         assert venueAddress != null : "Venue address cannot be null";
+        assert endDateTime.isAfter(startDateTime) : "End time must be after start time";
         assert venueCapacity > 0 : "Venue capacity must be greater than 0";
         assert numTicketsTotal <= venueCapacity : "Number of tickets must be less than or equal to venueCapacity";
 
@@ -59,6 +60,7 @@ public class Performance {
         this.numTicketsTotal = numTicketsTotal;
         this.ticketPrice = ticketPrice;
         this.status = PerformanceStatus.ACTIVE;
+        this.bookings = new ArrayList<>();
         this.event = event;
     }
 
@@ -295,7 +297,7 @@ public class Performance {
      */
     public boolean hasActiveBookings(){
         for(Booking b: bookings){
-            if (b.getStatus() != BookingStatus.CANCELLED){
+            if (b.getStatus() == BookingStatus.ACTIVE){
                 return true;
             }
         }
@@ -305,7 +307,7 @@ public class Performance {
     public String getBookingDetailsForRefund(){
         StringBuilder result = new StringBuilder();
         for (Booking b : bookings) {
-            if (b.getStatus() != BookingStatus.CANCELLED) {
+            if (b.getStatus() == BookingStatus.ACTIVE) {
                 result.append(b.generateBookingRecord()).append("\n");
             }
         }
@@ -318,8 +320,8 @@ public class Performance {
      * @param amount    amount admin would like to sponsor by
      */
     public void sponsor(double amount){
-            isSponsored = true;
-            sponsoredAmount = amount;
+        isSponsored = true;
+        sponsoredAmount = amount;
     }
 
     /**
@@ -329,8 +331,8 @@ public class Performance {
      * @param comment   review comment
      */
     public void review(int rating, String comment){
-         reviewRatings.add(rating);
-         reviewComments.add(comment);
+        reviewRatings.add(rating);
+        reviewComments.add(comment);
     }
 
     /**
@@ -341,6 +343,13 @@ public class Performance {
     public void addBooking(Booking b){
         bookings.add(b);
         numTicketsSold += b.getNumTickets();
+    }
+
+    /**
+     * Resets the performance ID counter. For testing purposes only.
+     */
+    public static void resetPerformanceIDCounter() {
+        nextPerformanceId = 1;
     }
 
     /**
@@ -355,4 +364,3 @@ public class Performance {
     }
 
 }
-
