@@ -4,27 +4,29 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.time.LocalDate;
+
 
 public class Event {
+    private long nextEventId = 1;
 
-    private static long nextEventId = 1;
-
-    private long eventID;
+    private final long eventID;
     private String title;
     private EventType type;
     private boolean isTicketed;
-    private EntertainmentProvider organiser;
+    private final EntertainmentProvider organiser;
     private ArrayList<Performance> performances;
 
 
     /**
-     * Creates an new event with the given details
+     * Creates a new event with the given details
      *
-     * @param title         the title of the event
-     * @param type          what type of event it is
-     * @param isTicketed    whether or not the event is ticketed
+     * @param title      the title of the event
+     * @param type       what type of event it is
+     * @param isTicketed whether the event is ticketed
      */
-    public Event (String title, EventType type, boolean isTicketed, EntertainmentProvider organiser) {
+    public Event(String title, EventType type, boolean isTicketed,
+                 EntertainmentProvider organiser) {
         assert title != null : "Title cannot be null";
         assert type != null : "Type cannot be null";
         assert organiser != null : "Organiser cannot be null";
@@ -42,53 +44,59 @@ public class Event {
      *
      * @return event ID
      */
-    public long getEventID(){return eventID;}
+    public long getEventID() {
+        return eventID;
+    }
 
     /**
      * get the title of the event
      *
      * @return event's title
      */
-    public String getTitle(){return title;}
+    public String getTitle() {
+        return title;
+    }
 
     /**
      * get the event's type
      *
      * @return event type
      */
-    public EventType getType(){return type;}
+    public EventType getType() {
+        return type;
+    }
 
     /**
-     * return whether or not the event is ticketed
+     * return whether the event is ticketed
      *
      * @return if event is ticketed
      */
-    public boolean isTicketed(){return isTicketed;}
+    public boolean isTicketed() {
+        return isTicketed;
+    }
 
 
     /**
-     * creates new performance usen given data
+     * creates new performance using given data
      *
-     * @param performanceID         performance's ID
-     * @param startDateTime         date and time performance starts
-     * @param endDateTime           date and time performance ends
-     * @param performerNames        names of the performers
-     * @param venueAddress          address of venue
-     * @param venueCapacity         capacity of the venue
-     * @param venueIsOutdoors       whether the venue is outdoors
-     * @param venueAllowsSmoking    whether the venue allows smoking
-     * @param numTickets            number of tickets available to buy
-     * @param ticketPrice           price of the tickets
-     *
+     * @param startDateTime      date and time performance starts
+     * @param endDateTime        date and time performance ends
+     * @param performerNames     names of the performers
+     * @param venueAddress       address of venue
+     * @param venueCapacity      capacity of the venue
+     * @param venueIsOutdoors    whether the venue is outdoors
+     * @param venueAllowsSmoking whether the venue allows smoking
+     * @param numTickets         number of tickets available to buy
+     * @param ticketPrice        price of the tickets
      * @return the performance added
      */
-    public Performance createPerformance(long performanceID, LocalDateTime startDateTime, LocalDateTime endDateTime,
+    public Performance createPerformance(LocalDateTime startDateTime, LocalDateTime endDateTime,
                                          List<String> performerNames,
                                          String venueAddress, int venueCapacity, boolean venueIsOutdoors,
-                                         boolean venueAllowsSmoking, int numTickets, double ticketPrice) {
+                                         boolean venueAllowsSmoking, int numTickets, double ticketPrice, Event event) {
         assert performerNames != null : "PerformerNames cannot be null";
         assert venueAddress != null : "VenueAddress cannot be null";
-        assert hasPerformancesAtSameTimes(startDateTime, endDateTime) != false :
+        assert !hasPerformancesAtSameTimes(startDateTime, endDateTime) :
                 "A performance in this event already ahs the same starr and date time";
         assert startDateTime.isBefore(endDateTime) : "Start date cannot be after end date";
         assert venueCapacity > 0 : "VenueCapacity cannot be negative";
@@ -102,16 +110,16 @@ public class Event {
         performances.add(p);
         return p;
     }
+
     /**
-     * get the perfomance using ID
+     * get the performance using ID
      *
-     * @param performanceID     ID of performance
-     *
-     * @return the perfomance that matches ID
+     * @param performanceID ID of performance
+     * @return the performance that matches ID
      */
-    public Performance getPerformanceByID(long performanceID) {
-        for (Performance p : performances){
-            if (p.getPerformanceId() == performanceID){
+    public Performance getPerformanceById(long performanceID) {
+        for (Performance p : performances) {
+            if (p.getPerformanceId() == performanceID) {
                 return p;
             }
         }
@@ -121,15 +129,14 @@ public class Event {
     /**
      * get the details for all performances that are on specified date
      *
-     * @param searchDateTime    the date they want to all perfomances that are on
-     *
+     * @param searchDate the date they want to all performances that are on
      * @return list of all performances on that day
      */
-    public Collection<String> getInfoOfPerformancesOnDate(LocalDateTime searchDateTime){
+    public Collection<String> getInfoOfPerformancesOnDate(LocalDate searchDate) {
         Collection<String> result = new ArrayList<>();
-        for (Performance p : performances){
-            if (p.getStartDateTime().toLocalDate().equals(searchDateTime.toLocalDate())){
-                result.add(p.toString());
+        for (Performance p : performances) {
+            if (p.getStartDateTime().toLocalDate().equals(searchDate)) {
+                result.add(performanceFormat(p));
             }
         }
         return result;
@@ -140,7 +147,7 @@ public class Event {
      *
      * @return organiser's name
      */
-    private String getOrganiserName(){
+    private String getOrganiserName() {
         return organiser.getOrgName();
     }
 
@@ -149,7 +156,7 @@ public class Event {
      *
      * @return organiser's email
      */
-    public String getOrganiserEmail(){
+    public String getOrganiserEmail() {
         return organiser.getEmail();
     }
 
@@ -159,19 +166,19 @@ public class Event {
      * @return average rating of performances
      */
     public double getAverageRatingOfPerformances() {
-        if(performances.isEmpty()) return 0.0;
+        if (performances.isEmpty()) return 0.0;
         double total = 0.0;
         int count = 0;
         for (Performance p : performances) {
-            for (int rating : p.getReviewRatings()){
+            for (int rating : p.getReviewRatings()) {
                 total += rating;
                 count++;
             }
         }
-        if (count == 0){
+        if (count == 0) {
             return 0.0;
         }
-        return (total/count);
+        return (total / count);
     }
 
 
@@ -182,7 +189,7 @@ public class Event {
      */
     public Collection<String> getAllPerformanceReviews() {
         Collection<String> result = new ArrayList<>();
-        for(Performance p : performances){
+        for (Performance p : performances) {
             result.addAll(p.getReviewComments());
         }
         return result;
@@ -193,13 +200,12 @@ public class Event {
      *
      * @param startDateTime start time of performance
      * @param endDateTime   end time of performance
-     *
-     * @return whether a perfomance already exists with same timings
+     * @return whether a performance already exists with same timings
      */
-    private boolean hasPerformancesAtSameTimes(LocalDateTime startDateTime, LocalDateTime endDateTime){
-        for(Performance p : performances){
-            if(p.getStartDateTime().equals(startDateTime)
-                && p.getEndDateTime().equals(endDateTime)){
+    private boolean hasPerformancesAtSameTimes(LocalDateTime startDateTime, LocalDateTime endDateTime) {
+        for (Performance p : performances) {
+            if (p.getStartDateTime().equals(startDateTime)
+                    && p.getEndDateTime().equals(endDateTime)) {
                 return true;
             }
         }
@@ -207,7 +213,7 @@ public class Event {
     }
 
     /**
-     * add a perfromance
+     * add a performance
      */
     public void addPerformance(Performance p){
         performances.add(p);
@@ -221,15 +227,31 @@ public class Event {
     }
 
     /**
-     * overrides java's toString() method for better formatting
+     * formats and get all relevant information
      *
      * @return string in correct format
      */
-    @Override
-    public String toString() {
-        return "Event{id=" + eventID + ", title='" + title + "', type=" + type +
-                ", ticketed=" + isTicketed + "}";
-    }
+    public String performanceFormat(Performance p) {
+        if (p == null) return "No performance found.";
+        if (p.getStatus().equals("CANCELLED")) {
+            return "This performance has been cancelled.";
+        }
 
-    //make performances list?
+        if (p.checkIfEventIsTicketed()) {
+            return "Performance ID: " + p.getPerformanceId() + "\nStart date and time: " + p.getStartDateTime()
+                    + " End date and time: " + p.getEndDateTime() + "\nPerformer's names: " + p.getPerformerNames()
+                    + "\nVenue address: " + p.getVenueAddress() + " Venue capacity: " + p.getVenueCapacity()
+                    + "\nIs venue outdoors: " + p.isVenueIsOutdoors() + " Does the venue allows smoking: " + p.doesVenueAllowsSmoking()
+                    + "\nTicket price: " + p.getFinalTicketPrice()
+                    + "\nThe average rating for this event: " + this.getAverageRatingOfPerformances();
+        }
+
+        //else performance is not ticketed
+        return "Performance ID: " + p.getPerformanceId() + "\nStart date and time: " + p.getStartDateTime()
+                + " End date and time: " + p.getEndDateTime() + "\nPerformer's names: " + p.getPerformerNames()
+                + "\nVenue address: " + p.getVenueAddress() + " Venue capacity: " + p.getVenueCapacity()
+                + "\nIs venue outdoors: " + p.isVenueIsOutdoors() + " Does the venue allows smoking: " + p.doesVenueAllowsSmoking()
+                + "\nThis performance is now tickets, bookings cannot be made."
+                + "\nThe average rating for this event: " + this.getAverageRatingOfPerformances();
+    }
 }
