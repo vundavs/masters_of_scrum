@@ -346,6 +346,13 @@ public class Performance {
     }
 
     /**
+     * Resets the performance ID counter. For testing purposes only.
+     */
+    public static void resetPerformanceIDCounter() {
+        nextPerformanceId = 1;
+    }
+
+    /**
      * overrides java's toString() method for better formatting
      *
      * @return string in correct format

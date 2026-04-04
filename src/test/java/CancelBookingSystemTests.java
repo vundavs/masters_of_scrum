@@ -150,6 +150,22 @@ public class CancelBookingSystemTests extends TestSystemBase {
                 "Error should state that the booking number is invalid");
     }
 
+    @Test
+    void testCancelBookingFailsWhenAdminLoggedIn() {
+        // Admin staff are not allowed to cancel bookings.
+        TestView view = new TestView();
+        initControllers(view);
+
+        registerEP(view);
+
+        loginAsAdmin("admin@uni.ac.uk", "adminpass", view);
+        view.addInputs("1");
+        bookingController.cancelBooking();
+
+        assertTrue(view.hasErrorContaining("student"),
+                "Error should state that a student must be logged in");
+    }
+
     // Already-cancelled booking
 
     @Test
