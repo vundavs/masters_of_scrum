@@ -16,6 +16,7 @@ public class CreateEventSystemTests extends TestSystemBase {
         TestView view = new TestView();
         initControllers(view);
 
+        registerEP(view);
         loginAsEP("ep@musicco.com", "eppass", view, epController, bookingController);
         view.addInputs("Jazz Show", "MUSIC", "true");
         epController.createEvent();
@@ -61,6 +62,7 @@ public class CreateEventSystemTests extends TestSystemBase {
         TestView view = new TestView();
         initControllers(view);
 
+        registerEP(view);
         loginAsEP("ep@musicco.com", "eppass", view, epController, bookingController);
         view.addInputs("", "MUSIC", "true");
         epController.createEvent();
@@ -76,8 +78,10 @@ public class CreateEventSystemTests extends TestSystemBase {
         TestView view = new TestView();
         initControllers(view);
 
+        registerEP(view);
         loginAsEP("ep@musicco.com", "eppass", view, epController, bookingController);
         view.addInputs("Romeo and Juliet", "", "true");
+        epController.createEvent();
 
         assertEquals(0, events.size(),
                 "Event should not be made if type is empty");
@@ -90,6 +94,7 @@ public class CreateEventSystemTests extends TestSystemBase {
         TestView view = new TestView();
         initControllers(view);
 
+        registerEP(view);
         loginAsEP("ep@musicco.com", "eppass", view, epController, bookingController);
         view.addInputs("Jazz Show", "MUSIC", " ");
         epController.createEvent();
@@ -105,6 +110,7 @@ public class CreateEventSystemTests extends TestSystemBase {
         TestView view = new TestView();
         initControllers(view);
 
+        registerEP(view);
         loginAsEP("ep@musicco.com", "eppass", view, epController, bookingController);
         view.addInputs(" Romeo and Juliet ", "THEATRE", "true");
         epController.createEvent();
@@ -134,6 +140,7 @@ public class CreateEventSystemTests extends TestSystemBase {
         TestView view = new TestView();
         initControllers(view);
 
+        registerEP(view);
         loginAsEP("ep@musicco.com", "eppass", view, epController, bookingController);
         view.addInputs("Black Swan", "dance", "false");
         epController.createEvent();
@@ -149,6 +156,7 @@ public class CreateEventSystemTests extends TestSystemBase {
         TestView view = new TestView();
         initControllers(view);
 
+        registerEP(view);
         loginAsEP("ep@musicco.com", "eppass", view, epController, bookingController);
         view.addInputs("Black Swan", "DANCE", "TRUE");
         epController.createEvent();
@@ -164,6 +172,7 @@ public class CreateEventSystemTests extends TestSystemBase {
         TestView view = new TestView();
         initControllers(view);
 
+        registerEP(view);
         loginAsEP("ep@musicco.com", "eppass", view, epController, bookingController);
         view.addInputs("Art Show", "OTHER", "true");
         epController.createEvent();
@@ -179,6 +188,7 @@ public class CreateEventSystemTests extends TestSystemBase {
         TestView view = new TestView();
         initControllers(view);
 
+        registerEP(view);
         loginAsEP("ep@musicco.com", "eppass", view, epController, bookingController);
         view.addInputs("Black Swan", "DANCE", "yes");
         epController.createEvent();

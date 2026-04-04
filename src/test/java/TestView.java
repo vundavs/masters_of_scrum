@@ -79,6 +79,7 @@ public class TestView implements View {
     @Override
     public void displayListofPerformances(Collection<String> list) {
         performanceDisplays.addAll(list);
+        successMessages.addAll(list);
     }
 
     /**
@@ -93,7 +94,7 @@ public class TestView implements View {
 
     @Override
     public void displaySpecificPerformance(String info) {
-        // Not needed for assertion purposes; intentionally empty.
+        successMessages.add(info);
     }
 
     @Override

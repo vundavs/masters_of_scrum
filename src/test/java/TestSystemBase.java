@@ -69,7 +69,7 @@ public abstract class TestSystemBase {
         userController = new UserController(paymentSystem, verificationService);
         userController.setView(view);
 
-        epController = new EventPerformanceController(view, performances);
+        epController = new EventPerformanceController(view, events, performances, paymentSystem);
         bookingController = new BookingController(paymentSystem, view, performances, bookings);
 
         // Pre-register students and admin (not registered via the public EP flow)

@@ -163,6 +163,10 @@ public class UserController extends Controller {
         StudentPreferences preferences = student.getPreferences();
 
         String input = view.getInput("Enter new preferences e.g. (music, dance, movie, sports): ");
+        if (input == null || input.trim().isEmpty()) {
+            view.displayError("Preferences input cannot be empty.");
+            return;
+        }
         preferences.updatePreferences(input);
 
         view.displaySuccess("Successfully updated preferences.");
