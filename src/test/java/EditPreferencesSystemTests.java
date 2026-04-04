@@ -130,6 +130,7 @@ public class EditPreferencesSystemTests extends TestSystemBase {
         view.addInputs("music");
         userController.editPreferences();
 
+        view.addInputs(musicPerf.getStartDateTime().toLocalDate().toString());
         epController.searchForPerformances();
 
         // Should only see music events
