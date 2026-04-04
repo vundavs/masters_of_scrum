@@ -37,19 +37,29 @@ public class EventPerformanceController extends Controller {
      * Handles the search for performances by date use case.
      */
     public void searchForPerformances() {
-        String dateInput = view.getInput("Enter date to search for performances in dd--mm-yyyy format");
+        String dateInput = view.getInput("Enter date to search for performances in yyyy-MM-dd format");
         LocalDate searchDate = null;
         try {
             searchDate = LocalDate.parse(dateInput.trim());
         } catch (DateTimeParseException e) {
-            view.displayError("Invalid date format. Must be in dd-mm-yyyy format.");
+            view.displayError("Invalid date format. Must be in yyyy-MM-dd format.");
             return;
         }
+
+        if(searchDate.isBefore(LocalDate.now())) {
+            view.displayError("This date has already passed.");
+        }
+
+        if(searchDate == null) {
+            view.displayError("No performances found for given date.");
+            return;
+        }
+
 
         for (Event e : events) {
             Collection<String> results = e.getInfoOfPerformancesOnDate(searchDate);
             for (String s : results) {
-                System.out.println(s);
+                view.displaySuccess(s);
             }
         }
     }
@@ -58,6 +68,10 @@ public class EventPerformanceController extends Controller {
      * Handles the view performance use case.
      */
     public void viewPerformance() {
+        if (checkCurrentUserIsGuest()) {
+            view.displayError("You must be logged in to view performances.");
+        }
+
         String input = view.getInput("Enter performance ID to view: ");
 
         long performanceID;
@@ -80,8 +94,7 @@ public class EventPerformanceController extends Controller {
             return;
         }
         Event e = p.getEvent();
-
-        System.out.println(e.performanceFormat(p));
+        view.displaySuccess(e.performanceFormat(p));
     }
 
 
@@ -96,6 +109,10 @@ public class EventPerformanceController extends Controller {
 
         String title = (String) view.getInput("Enter event title: ");
         title = title.trim();
+        if(title.isEmpty()) {
+            view.displayError("Title cannot be empty.");
+            return null;
+        }
 
         String typeInput = view.getInput("Enter event type (MUSIC, THEATRE, DANCE, MOVIE, OR SPORTS): ");
         EventType type;
@@ -106,17 +123,17 @@ public class EventPerformanceController extends Controller {
             return null;
         }
 
-
         String isTicketedInput = view.getInput("Is the event ticketed? (true/false)");
         isTicketedInput = isTicketedInput.toLowerCase().trim();
         if (!isTicketedInput.equals("true") && !isTicketedInput.equals("false")) {
-            view.displayError("Invalid input, please enter 'true' or 'false'. Is the event ticketed?");
+            view.displayError("Invalid input, please enter 'true' or 'false'.");
         }
         boolean isTicketed = Boolean.parseBoolean(isTicketedInput);
 
         EntertainmentProvider organiser = (EntertainmentProvider) getCurrentUser();
         Event e = new Event(title, type, isTicketed, organiser);
         events.add(e);
+        view.displaySuccess("Event created successfully.");
         return e;
     }
 
@@ -180,7 +197,7 @@ public class EventPerformanceController extends Controller {
         }
 
         p.sponsor(amount);
-        System.out.println("Performance sponsored successfully.");
+        view.displaySuccess("Performance sponsored successfully.");
     }
 
 
