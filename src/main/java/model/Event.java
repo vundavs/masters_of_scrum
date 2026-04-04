@@ -8,7 +8,7 @@ import java.time.LocalDate;
 
 
 public class Event {
-    private long nextEventId = 1;
+    private static long nextEventId = 1;
 
     private final long eventID;
     private String title;
@@ -93,7 +93,7 @@ public class Event {
     public Performance createPerformance(LocalDateTime startDateTime, LocalDateTime endDateTime,
                                          List<String> performerNames,
                                          String venueAddress, int venueCapacity, boolean venueIsOutdoors,
-                                         boolean venueAllowsSmoking, int numTickets, double ticketPrice, Event event) {
+                                         boolean venueAllowsSmoking, int numTickets, double ticketPrice) {
         assert performerNames != null : "PerformerNames cannot be null";
         assert venueAddress != null : "VenueAddress cannot be null";
         assert !hasPerformancesAtSameTimes(startDateTime, endDateTime) :
