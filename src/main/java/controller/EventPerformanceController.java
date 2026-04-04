@@ -139,11 +139,68 @@ public class EventPerformanceController extends Controller {
 
     /**
      * Handles the cancel performance use case for entertainment providers.
-     * TODO: paste in from sahasra
      */
     public void cancelPerformance() {
-        // TODO: implement cancel performance
-        view.displayError("Cancel performance not yet implemented.");
+        if (!checkCurrentUserIsEntertainmentProvider()) {
+            view.displayError("You must be logged in as an entertainment provider.");
+            return;
+        }
+
+        String input = view.getInput("Enter performance ID to cancel:");
+        long performanceID;
+        try {
+            performanceID = Long.parseLong(input.trim());
+        } catch (NumberFormatException e) {
+            view.displayError("Invalid performance ID.");
+            return;
+        }
+
+        Performance performance = getPerformanceByID(performanceID);
+        if (performance == null) {
+            view.displayError("Performance with given number does not exist.");
+            return;
+        }
+
+        EntertainmentProvider ep = (EntertainmentProvider) currentUser;
+        if (!performance.checkCreatedByEP(ep.getEmail())) {
+            view.displayError("This performance does not belong to you.");
+            return;
+        }
+
+        if (!performance.checkHasNotHappenedYet()) {
+            view.displayError("Performance can't be cancelled as it has already happened.");
+            return;
+        }
+
+        if (performance.hasActiveBookings()) {
+            String organiserMessage = view.getInput("Enter a cancellation message for affected students:");
+            while (organiserMessage == null || organiserMessage.trim().isEmpty()) {
+                view.displayError("Please provide a non-empty message for the students.");
+                organiserMessage = view.getInput("Enter a cancellation message for affected students:");
+            }
+
+            for (Booking b : performance.getBookings()) {
+                if (b.getStatus() == BookingStatus.ACTIVE) {
+                    boolean refundSuccessful = paymentSystem.processRefund(
+                            b.getNumTickets(),
+                            performance.getEventTitle(),
+                            b.getStudent().getEmail(),
+                            b.getStudent().getPhoneNumber(),
+                            performance.getOrganiserEmail(),
+                            b.getAmountPaid(),
+                            organiserMessage);
+
+                    if (!refundSuccessful) {
+                        view.displayError("There was an issue with a refund. The performance cannot be cancelled.");
+                        return;
+                    }
+                    b.cancelByProvider();
+                }
+            }
+        }
+
+        performance.cancel();
+        view.displaySuccess("Cancellation Successful!");
     }
 
     /**
