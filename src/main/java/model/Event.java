@@ -214,6 +214,13 @@ public class Event {
     }
 
     /**
+     * Resets the event ID counter. For testing purposes only.
+     */
+    public static void resetEventIDCounter() {
+        nextEventId = 1;
+    }
+
+    /**
      * overrides java's toString() method for better formatting
      *
      * @return string in correct format

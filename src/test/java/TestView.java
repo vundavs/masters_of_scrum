@@ -23,6 +23,7 @@ public class TestView implements View {
     private final List<String> successMessages = new ArrayList<>();
     private final List<String> errorMessages = new ArrayList<>();
     private final List<String> bookingRecords = new ArrayList<>();
+    private final List<String> performanceDisplays = new ArrayList<>();
 
     /** Creates a TestView with no pre-loaded inputs. */
     public TestView() {}
@@ -77,7 +78,17 @@ public class TestView implements View {
 
     @Override
     public void displayListofPerformances(Collection<String> list) {
-        // Not needed for assertion purposes; intentionally empty.
+        performanceDisplays.addAll(list);
+    }
+
+    /**
+     * Returns the list of performance strings that were displayed via
+     * {@link #displayListofPerformances}.
+     *
+     * @return displayed performance strings
+     */
+    public List<String> getPerformanceDisplays() {
+        return performanceDisplays;
     }
 
     @Override

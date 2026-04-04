@@ -33,7 +33,7 @@ public class RegisterEntertainmentProviderSystemTests extends TestSystemBase {
         userController.login();
 
         assertTrue(view.hasSuccessContaining("Successfully logged in."));
-        assertInstanceOf(userController.getCurrentUser(), EntertainmentProvider.class);
+        assertInstanceOf(EntertainmentProvider.class, userController.getCurrentUser());
     }
 
     /**
@@ -48,7 +48,7 @@ public class RegisterEntertainmentProviderSystemTests extends TestSystemBase {
 
         view.addInputs("student1@uni.ac.uk", "pass1");
         userController.login();
-        assertInstanceOf(Student, userController.getCurrentUser());
+        assertInstanceOf(Student.class, userController.getCurrentUser());
 
         // Attempt to register as an EP
         userController.registerEntertainmentProvider();
