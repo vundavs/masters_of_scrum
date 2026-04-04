@@ -106,7 +106,7 @@ public class Event {
 
         Performance p = new Performance(startDateTime, endDateTime,
                 performerNames, venueAddress, venueCapacity, venueIsOutdoors,
-                venueAllowsSmoking, numTickets, ticketPrice, this);
+                venueAllowsSmoking, numTickets, ticketPrice, new ArrayList<>(), this);
         performances.add(p);
         return p;
     }
@@ -215,8 +215,15 @@ public class Event {
     /**
      * add a performance
      */
-    private void addPerformance(Performance p) {
+    public void addPerformance(Performance p){
         performances.add(p);
+    }
+
+    /**
+     * Resets the event ID counter. For testing purposes only.
+     */
+    public static void resetEventIDCounter() {
+        nextEventId = 1;
     }
 
     /**

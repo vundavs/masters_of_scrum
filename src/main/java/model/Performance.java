@@ -207,47 +207,56 @@
         public PerformanceStatus getStatus() {
             return status;
         }
+        return getTicketPrice();
+    }
 
-        /**
-         * gets the list of bookings for performance
-         *
-         * @return the list of booking of performance
-         */
-        public List<Booking> getBookings() { return bookings; }
+    /**
+     * gets the organiser/EP's email
+     *
+     * @return organiser's email
+     */
+    public String getOrganiserEmail(){
+        return event.getOrganiserEmail();
+    }
 
-        /**
-         * get event performance belongs to
-         *
-         * @return the event the performance is apart of
-         */
-        public Event getEvent() { return event; }
+    /**
+     * gets the event titls
+     *
+     * @return event title
+     */
+    public String getEventTitle(){
+        return event.getTitle();
+    }
 
-        //METHODS
+    /**
+     * checks if the event has already happend
+     *
+     * @return if event has already started
+     */
+    public boolean checkHasNotHappenedYet(){
+        return startDateTime.isAfter(LocalDateTime.now());
+    }
 
-        /**
-         * Cancels this performance and changes status
-         */
-        public void cancel(){
-            this.status = PerformanceStatus.CANCELLED;
-        }
 
-        /**
-         * checks if the event is ticketed
-         *
-         * @return whether the event is ticketed
-         */
-        public boolean checkIfEventIsTicketed(){
-            return event.isTicketed();
-        }
+    /**
+     * checks if the performance was made by an EP
+     *
+     * @param email     the email of creator of performance
+     *
+     * @return whether event was created by an EP
+     */
+    public boolean checkCreatedByEP(String email){
+        return event.getOrganiserEmail().equals(email);
+    }
 
-        /**
-         * checks if there is enough tickets left to buy
-         * @param numTicketsToBuy   the number of tickets the student wants to buy
-         * @return if there is enough tickets (t/f)
-         */
-        public boolean checkIfTicketsLeft(int numTicketsToBuy){
-            assert numTicketsToBuy > 0 : "Number of tickets to buy must be greater than 0";
-            if (getNumTicketsTotal() - getNumTicketsSold() - numTicketsToBuy >= 0){
+    /**
+     * checks if a perfomance has any active bookings
+     *
+     * @return whether an event has any active bookings
+     */
+    public boolean hasActiveBookings(){
+        for(Booking b: bookings){
+            if (b.getStatus() == BookingStatus.ACTIVE){
                 return true;
             }
             return false;
@@ -335,37 +344,56 @@
             isSponsored = true;
             sponsoredAmount = amount;
         }
-
-        /**
-         * add review and its comment
-         *
-         * @param rating    review number rating
-         * @param comment   review comment
-         */
-        public void review(int rating, String comment){
-            reviewRatings.add(rating);
-            reviewComments.add(comment);
-        }
-
-        /**
-         * adds a booking
-         *
-         * @param b the booking
-         */
-        public void addBooking(Booking b){
-            bookings.add(b);
-            numTicketsSold += b.getNumTickets();
-        }
-
-        /**
-         * overrides java's toString() method for better formatting
-         *
-         * @return string in correct format
-         */
-        @Override
-        public String toString() {
-            return "Performance{id=" + performanceId + ", venue='" + venueAddress +
-                    "', start=" + startDateTime + ", status=" + status + "}";
-        }
-
+        return result.toString();
     }
+
+    /**
+     * sponsor event
+     *
+     * @param amount    amount admin would like to sponsor by
+     */
+    public void sponsor(double amount){
+        isSponsored = true;
+        sponsoredAmount = amount;
+    }
+
+    /**
+     * add review and its comment
+     *
+     * @param rating    review number rating
+     * @param comment   review comment
+     */
+    public void review(int rating, String comment){
+        reviewRatings.add(rating);
+        reviewComments.add(comment);
+    }
+
+    /**
+     * adds a booking
+     *
+     * @param b the booking
+     */
+    public void addBooking(Booking b){
+        bookings.add(b);
+        numTicketsSold += b.getNumTickets();
+    }
+
+    /**
+     * Resets the performance ID counter. For testing purposes only.
+     */
+    public static void resetPerformanceIDCounter() {
+        nextPerformanceId = 1;
+    }
+
+    /**
+     * overrides java's toString() method for better formatting
+     *
+     * @return string in correct format
+     */
+    @Override
+    public String toString() {
+        return "Performance{id=" + performanceId + ", venue='" + venueAddress +
+                "', start=" + startDateTime + ", status=" + status + "}";
+    }
+
+}

@@ -34,11 +34,12 @@ public class TestBooking {
         EntertainmentProvider ep = new EntertainmentProvider(
                 "ep@org.com", "pass", "Music Co", "1234567890", "Bob", "Concerts");
         Event event = new Event("Jazz Night", EventType.MUSIC, true, ep);
-        performance = new Performance(event,
+        performance = new Performance(
                 LocalDateTime.now().plusDays(1),
                 LocalDateTime.now().plusDays(1).plusHours(2),
                 List.of("Jazz Trio"),
-                "Edinburgh Venue", 100, false, false, 50, 20.0);
+                "Edinburgh Venue", 100, false, false, 50, 20.0,
+                new java.util.ArrayList<>(), event);
     }
 
     @Test

@@ -103,11 +103,12 @@ public class EditPreferencesSystemTests extends TestSystemBase {
                 "Jazz Night", model.EventType.MUSIC, true, ep);
         events.add(musicEvent);
         ep.addEvent(musicEvent);
-        model.Performance musicPerf = new model.Performance(musicEvent,
+        model.Performance musicPerf = new model.Performance(
                 java.time.LocalDateTime.now().plusDays(7),
                 java.time.LocalDateTime.now().plusDays(7).plusHours(2),
                 java.util.List.of("Jazz Trio"),
-                "Venue A", 100, false, false, 50, 20.0);
+                "Venue A", 100, false, false, 50, 20.0,
+                java.util.List.of(), musicEvent);
         performances.add(musicPerf);
         musicEvent.addPerformance(musicPerf);
 
@@ -115,11 +116,12 @@ public class EditPreferencesSystemTests extends TestSystemBase {
                 "Football Match", model.EventType.SPORTS, true, ep);
         events.add(sportsEvent);
         ep.addEvent(sportsEvent);
-        model.Performance sportsPerf = new model.Performance(sportsEvent,
+        model.Performance sportsPerf = new model.Performance(
                 java.time.LocalDateTime.now().plusDays(7),
                 java.time.LocalDateTime.now().plusDays(7).plusHours(2),
                 java.util.List.of("Team A vs Team B"),
-                "Stadium", 5000, true, false, 1000, 15.0);
+                "Stadium", 5000, true, false, 1000, 15.0,
+                java.util.List.of(), sportsEvent);
         performances.add(sportsPerf);
         sportsEvent.addPerformance(sportsPerf);
 
