@@ -4,6 +4,9 @@ import model.EntertainmentProvider;
 import model.Performance;
 import model.Event;
 import model.EventType;
+import model.Booking;
+import model.BookingStatus;
+import external.PaymentSystem;
 import view.View;
 
 import java.time.LocalDate;
@@ -21,6 +24,8 @@ public class EventPerformanceController extends Controller {
 
     private List<Event> events;
     private List<Performance> performances;
+
+    private PaymentSystem paymentSystem;
 
     /**
      * Creates a new EventPerformanceController.
@@ -155,11 +160,14 @@ public class EventPerformanceController extends Controller {
             return;
         }
 
-        Performance performance = getPerformanceByID(performanceID);
-        if (performance == null) {
-            view.displayError("Performance with given number does not exist.");
-            return;
-        }
+        Performance performance = null;
+        for (Event e : events){
+            performance = e.getPerformanceById(performanceID);
+            if (performance == null) {
+                view.displayError("Performance with given number does not exist.");
+                return;
+            }
+            }
 
         EntertainmentProvider ep = (EntertainmentProvider) currentUser;
         if (!performance.checkCreatedByEP(ep.getEmail())) {
