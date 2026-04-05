@@ -100,28 +100,30 @@ public class EditPreferencesSystemTests extends TestSystemBase {
         // Create a MUSIC performance and a SPORTS performance
         model.EntertainmentProvider ep = registerEP(view);
         model.Event musicEvent = new model.Event(
-                "Jazz Night", model.EventType.MUSIC, true, ep);
+                nextTestEventId++, "Jazz Night", model.EventType.MUSIC, true, ep);
         events.add(musicEvent);
         ep.addEvent(musicEvent);
         model.Performance musicPerf = new model.Performance(
+                nextTestPerfId++,
                 java.time.LocalDateTime.now().plusDays(7),
                 java.time.LocalDateTime.now().plusDays(7).plusHours(2),
                 java.util.List.of("Jazz Trio"),
                 "Venue A", 100, false, false, 50, 20.0,
-                java.util.List.of(), musicEvent);
+                new java.util.ArrayList<>(), musicEvent);
         performances.add(musicPerf);
         musicEvent.addPerformance(musicPerf);
 
         model.Event sportsEvent = new model.Event(
-                "Football Match", model.EventType.SPORTS, true, ep);
+                nextTestEventId++, "Football Match", model.EventType.SPORTS, true, ep);
         events.add(sportsEvent);
         ep.addEvent(sportsEvent);
         model.Performance sportsPerf = new model.Performance(
+                nextTestPerfId++,
                 java.time.LocalDateTime.now().plusDays(7),
                 java.time.LocalDateTime.now().plusDays(7).plusHours(2),
                 java.util.List.of("Team A vs Team B"),
                 "Stadium", 5000, true, false, 1000, 15.0,
-                java.util.List.of(), sportsEvent);
+                new java.util.ArrayList<>(), sportsEvent);
         performances.add(sportsPerf);
         sportsEvent.addPerformance(sportsPerf);
 

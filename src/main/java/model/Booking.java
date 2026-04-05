@@ -7,8 +7,6 @@ import java.time.LocalDateTime;
  */
 public class Booking {
 
-    private static long nextBookingNumber = 1;
-
     private final long bookingNumber;
     private final Student student;
     private final Performance performance;
@@ -25,14 +23,14 @@ public class Booking {
      * @param numTickets  the number of tickets booked
      * @param amountPaid  the total amount paid
      */
-    public Booking(Student student, Performance performance,
+    public Booking(long bookingNumber, Student student, Performance performance,
                    int numTickets, double amountPaid) {
         assert student != null : "Student cannot be null";
         assert performance != null : "Performance cannot be null";
         assert numTickets > 0 : "Number of tickets must be positive";
         assert amountPaid >= 0 : "Amount paid cannot be negative";
 
-        this.bookingNumber = nextBookingNumber++;
+        this.bookingNumber = bookingNumber;
         this.student = student;
         this.performance = performance;
         this.numTickets = numTickets;
@@ -162,10 +160,4 @@ public class Booking {
                 + " | Booked: " + bookingDateTime;
     }
 
-    /**
-     * Resets the booking number counter. For testing purposes only.
-     */
-    public static void resetBookingNumberCounter() {
-        nextBookingNumber = 1;
-    }
 }

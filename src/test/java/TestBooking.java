@@ -26,15 +26,12 @@ public class TestBooking {
 
     @BeforeEach
     void setUp() {
-        Booking.resetBookingNumberCounter();
-        Performance.resetPerformanceIDCounter();
-        Event.resetEventIDCounter();
-
         student = new Student("student@uni.ac.uk", "pass", "Alice", 712345678);
         EntertainmentProvider ep = new EntertainmentProvider(
                 "ep@org.com", "pass", "Music Co", "1234567890", "Bob", "Concerts");
-        Event event = new Event("Jazz Night", EventType.MUSIC, true, ep);
+        Event event = new Event(1L, "Jazz Night", EventType.MUSIC, true, ep);
         performance = new Performance(
+                1L,
                 LocalDateTime.now().plusDays(1),
                 LocalDateTime.now().plusDays(1).plusHours(2),
                 List.of("Jazz Trio"),
@@ -44,50 +41,50 @@ public class TestBooking {
 
     @Test
     void testBookingCreatedWithActiveStatus() {
-        Booking booking = new Booking(student, performance, 2, 40.0);
+        Booking booking = new Booking(1L, student, performance, 2, 40.0);
         assertEquals(BookingStatus.ACTIVE, booking.getStatus(),
                 "New booking should have ACTIVE status");
     }
 
     @Test
-    void testBookingNumberAutoIncrement() {
-        Booking b1 = new Booking(student, performance, 1, 20.0);
-        Booking b2 = new Booking(student, performance, 1, 20.0);
+    void testBookingNumbersAreStoredCorrectly() {
+        Booking b1 = new Booking(1L, student, performance, 1, 20.0);
+        Booking b2 = new Booking(2L, student, performance, 1, 20.0);
         assertEquals(b1.getBookingNumber() + 1, b2.getBookingNumber(),
-                "Booking numbers should auto-increment");
+                "Booking numbers should be stored in sequence");
     }
 
     @Test
     void testGetNumTickets() {
-        Booking booking = new Booking(student, performance, 3, 60.0);
+        Booking booking = new Booking(1L, student, performance, 3, 60.0);
         assertEquals(3, booking.getNumTickets(),
                 "Should return correct number of tickets");
     }
 
     @Test
     void testGetAmountPaid() {
-        Booking booking = new Booking(student, performance, 2, 40.0);
+        Booking booking = new Booking(1L, student, performance, 2, 40.0);
         assertEquals(40.0, booking.getAmountPaid(), 0.001,
                 "Should return correct amount paid");
     }
 
     @Test
     void testGetStudent() {
-        Booking booking = new Booking(student, performance, 1, 20.0);
+        Booking booking = new Booking(1L, student, performance, 1, 20.0);
         assertEquals(student, booking.getStudent(),
                 "Should return the correct student");
     }
 
     @Test
     void testGetPerformance() {
-        Booking booking = new Booking(student, performance, 1, 20.0);
+        Booking booking = new Booking(1L, student, performance, 1, 20.0);
         assertEquals(performance, booking.getPerformance(),
                 "Should return the correct performance");
     }
 
     @Test
     void testCancelByStudent() {
-        Booking booking = new Booking(student, performance, 1, 20.0);
+        Booking booking = new Booking(1L, student, performance, 1, 20.0);
         booking.cancelByStudent();
         assertEquals(BookingStatus.CANCELLEDBYSTUDENT, booking.getStatus(),
                 "Status should be CANCELLEDBYSTUDENT after student cancellation");
@@ -95,7 +92,7 @@ public class TestBooking {
 
     @Test
     void testCancelByProvider() {
-        Booking booking = new Booking(student, performance, 1, 20.0);
+        Booking booking = new Booking(1L, student, performance, 1, 20.0);
         booking.cancelByProvider();
         assertEquals(BookingStatus.CANCELLEDBYPROVIDER, booking.getStatus(),
                 "Status should be CANCELLEDBYPROVIDER after provider cancellation");
@@ -103,7 +100,7 @@ public class TestBooking {
 
     @Test
     void testCancelPaymentFailed() {
-        Booking booking = new Booking(student, performance, 1, 20.0);
+        Booking booking = new Booking(1L, student, performance, 1, 20.0);
         booking.cancelPaymentFailed();
         assertEquals(BookingStatus.PAYMENTFAILED, booking.getStatus(),
                 "Status should be PAYMENTFAILED after payment failure");
@@ -111,21 +108,21 @@ public class TestBooking {
 
     @Test
     void testCheckBookedByStudentCorrectEmail() {
-        Booking booking = new Booking(student, performance, 1, 20.0);
+        Booking booking = new Booking(1L, student, performance, 1, 20.0);
         assertTrue(booking.checkBookedByStudent("student@uni.ac.uk"),
                 "Should return true for the correct student email");
     }
 
     @Test
     void testCheckBookedByStudentWrongEmail() {
-        Booking booking = new Booking(student, performance, 1, 20.0);
+        Booking booking = new Booking(1L, student, performance, 1, 20.0);
         assertFalse(booking.checkBookedByStudent("other@uni.ac.uk"),
                 "Should return false for a different email");
     }
 
     @Test
     void testGetStudentDetails() {
-        Booking booking = new Booking(student, performance, 1, 20.0);
+        Booking booking = new Booking(1L, student, performance, 1, 20.0);
         String details = booking.getStudentDetails();
         assertTrue(details.contains("student@uni.ac.uk"),
                 "Student details should contain email");
@@ -135,7 +132,7 @@ public class TestBooking {
 
     @Test
     void testGenerateBookingRecord() {
-        Booking booking = new Booking(student, performance, 2, 40.0);
+        Booking booking = new Booking(1L, student, performance, 2, 40.0);
         String record = booking.generateBookingRecord();
         assertNotNull(record, "Booking record should not be null");
         assertTrue(record.contains("student@uni.ac.uk"),
@@ -148,14 +145,14 @@ public class TestBooking {
 
     @Test
     void testBookingDateTimeSet() {
-        Booking booking = new Booking(student, performance, 1, 20.0);
+        Booking booking = new Booking(1L, student, performance, 1, 20.0);
         assertNotNull(booking.getBookingDateTime(),
                 "Booking date time should be set on creation");
     }
 
     @Test
     void testZeroAmountPaidAllowed() {
-        Booking booking = new Booking(student, performance, 1, 0.0);
+        Booking booking = new Booking(1L, student, performance, 1, 0.0);
         assertEquals(0.0, booking.getAmountPaid(), 0.001,
                 "Zero amount paid should be allowed (free event)");
     }

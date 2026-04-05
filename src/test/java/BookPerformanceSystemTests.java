@@ -87,15 +87,16 @@ public class BookPerformanceSystemTests extends TestSystemBase {
         EntertainmentProvider ep = registerEP(view);
         // Create a free/non-ticketed performance
         model.Event freeEvent = new model.Event(
-                "Free Concert", model.EventType.MUSIC, false, ep);
+                nextTestEventId++, "Free Concert", model.EventType.MUSIC, false, ep);
         events.add(freeEvent);
         ep.addEvent(freeEvent);
         Performance p = new Performance(
+                nextTestPerfId++,
                 java.time.LocalDateTime.now().plusDays(7),
                 java.time.LocalDateTime.now().plusDays(7).plusHours(2),
                 java.util.List.of("Band"),
                 "City Park", 500, true, false, 0, 0.0,
-                java.util.List.of(), freeEvent);
+                new java.util.ArrayList<>(), freeEvent);
         performances.add(p);
         freeEvent.addPerformance(p);
 
@@ -116,15 +117,16 @@ public class BookPerformanceSystemTests extends TestSystemBase {
 
         EntertainmentProvider ep = registerEP(view);
         // Create performance with only 2 tickets
-        model.Event event = new model.Event("Tiny Gig", model.EventType.MUSIC, true, ep);
+        model.Event event = new model.Event(nextTestEventId++, "Tiny Gig", model.EventType.MUSIC, true, ep);
         events.add(event);
         ep.addEvent(event);
         Performance p = new Performance(
+                nextTestPerfId++,
                 java.time.LocalDateTime.now().plusDays(7),
                 java.time.LocalDateTime.now().plusDays(7).plusHours(2),
                 java.util.List.of("Band"),
                 "Tiny Venue", 10, false, false, 2, 20.0,
-                java.util.List.of(), event);
+                new java.util.ArrayList<>(), event);
         performances.add(p);
         event.addPerformance(p);
 

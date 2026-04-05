@@ -8,12 +8,15 @@ import model.Student;
 import view.View;
 
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Controller handling booking-related use cases:
  * book performance, cancel booking, and review performance.
  */
 public class BookingController extends Controller {
+
+    private long nextBookingNumber = 1;
 
     private final List<Booking> bookings;
     private final PaymentSystem paymentSystem;
@@ -96,7 +99,7 @@ public class BookingController extends Controller {
         double transactionAmount = ticketPrice * numTicketsRequested;
 
         Booking booking = new Booking(
-                student, performance, numTicketsRequested, transactionAmount);
+                nextBookingNumber++, student, performance, numTicketsRequested, transactionAmount);
 
         boolean paymentSuccessful = paymentSystem.processPayment(
                 numTicketsRequested, eventTitle,
@@ -294,8 +297,7 @@ public class BookingController extends Controller {
      * @return true if the performance is ticketed and has enough tickets left
      */
     private boolean checkIfBookingPossible(Performance performance, int numTickets) {
-        return performance.checkIfEventIsTicketed()
-                && performance.checkIfTicketsLeft(numTickets);
+        return performance.checkIfEventIsTicketed() && performance.checkIfTicketsLeft(numTickets);
     }
 
     /**
@@ -304,8 +306,8 @@ public class BookingController extends Controller {
      * @param eventID the event ID to search for
      * @return a collection of matching bookings
      */
-    private java.util.Collection<Booking> findBookingsByEventID(long eventID) {
-        java.util.List<Booking> result = new java.util.ArrayList<>();
+    private List<Booking> findBookingsByEventID(long eventID) {
+        List<Booking> result = new ArrayList<>();
         for (Booking b : bookings) {
             if (b.getPerformance().getPerformanceId() == eventID) {
                 result.add(b);
@@ -313,5 +315,6 @@ public class BookingController extends Controller {
         }
         return result;
     }
+
 }
 
