@@ -24,6 +24,7 @@ public class EventPerformanceController extends Controller {
 
     private List<Event> events;
     private List<Performance> performances;
+
     private PaymentSystem paymentSystem;
 
     /**
