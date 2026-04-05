@@ -21,6 +21,9 @@ import java.util.List;
  */
 public class EventPerformanceController extends Controller {
 
+    private long nextEventID = 1;
+    private long nextPerformanceID = 1;
+
     private List<Event> events;
     private List<Performance> performances;
 
@@ -95,13 +98,7 @@ public class EventPerformanceController extends Controller {
             return;
         }
 
-        Performance p = null;
-        for (Event e : events) {
-            p = e.getPerformanceById(performanceID);
-            if (p != null) {
-                break;
-            }
-        }
+        Performance p = getPerformanceByID(performanceID);
         if (p == null) {
             view.displayError("Performance not found.");
             return;
@@ -145,14 +142,81 @@ public class EventPerformanceController extends Controller {
         boolean isTicketed = Boolean.parseBoolean(isTicketedInput);
 
         EntertainmentProvider organiser = (EntertainmentProvider) getCurrentUser();
-        Event e = new Event(title, type, isTicketed, organiser);
+        Event e = new Event(nextEventID++, title, type, isTicketed, organiser);
+        organiser.addEvent(e);
         events.add(e);
         view.displaySuccess("Event created successfully.");
         return e;
     }
 
     /**
+     * Adds an existing event to the shared events list.
+     *
+     * @param e the event to add
+     */
+    public void addEvent(Event e) {
+        events.add(e);
+    }
+
+    /**
+     * Adds an existing performance to the shared performances list.
+     *
+     * @param p the performance to add
+     */
+    public void addPerformance(Performance p) {
+        performances.add(p);
+    }
+
+    /**
+     * Returns the event with the given ID, or null if not found.
+     *
+     * @param eventID the event ID to search for
+     * @return the matching Event, or null
+     */
+    public Event getEventByID(long eventID) {
+        for (Event e : events) {
+            if (e.getEventID() == eventID) {
+                return e;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns the first event whose title matches the given string (case-insensitive),
+     * or null if not found.
+     *
+     * @param title the event title to search for
+     * @return the matching Event, or null
+     */
+    public Event getEventByTitle(String title) {
+        for (Event e : events) {
+            if (e.getTitle().equalsIgnoreCase(title)) {
+                return e;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns the performance with the given ID, or null if not found.
+     *
+     * @param performanceID the performance ID to search for
+     * @return the matching Performance, or null
+     */
+    public Performance getPerformanceByID(long performanceID) {
+        for (Event e : events) {
+            Performance p = e.getPerformanceById(performanceID);
+            if (p != null) {
+                return p;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Handles the cancel performance use case for entertainment providers.
+     * Loops on invalid performance ID format; returns on semantic errors.
      */
     public void cancelPerformance() {
         if (!checkCurrentUserIsEntertainmentProvider()) {
@@ -160,22 +224,18 @@ public class EventPerformanceController extends Controller {
             return;
         }
 
-        String input = view.getInput("Enter performance ID to cancel:");
-        long performanceID;
-        try {
-            performanceID = Long.parseLong(input.trim());
-        } catch (NumberFormatException e) {
-            view.displayError("Invalid performance ID.");
-            return;
-        }
-
-        Performance performance = null;
-        for (Event e : events) {
-            performance = e.getPerformanceById(performanceID);
-            if (performance != null) {
+        long performanceID = -1;
+        while (true) {
+            String input = view.getInput("Enter performance ID to cancel:");
+            try {
+                performanceID = Long.parseLong(input.trim());
                 break;
+            } catch (NumberFormatException e) {
+                view.displayError("Invalid performance ID.");
             }
         }
+
+        Performance performance = getPerformanceByID(performanceID);
         if (performance == null) {
             view.displayError("Performance with given number does not exist.");
             return;
@@ -225,6 +285,7 @@ public class EventPerformanceController extends Controller {
 
     /**
      * Handles the sponsor performance use case for admin staff.
+     * Loops on invalid performance ID or amount format; returns on semantic errors.
      */
     public void sponsorPerformance() {
         if (!checkCurrentUserIsAdmin()) {
@@ -232,22 +293,18 @@ public class EventPerformanceController extends Controller {
             return;
         }
 
-        String performanceIDInput = view.getInput("Enter performance ID of performance you wish to sponsor:");
-        long performanceID;
-        try {
-            performanceID = Long.parseLong(performanceIDInput.trim());
-        } catch (NumberFormatException e) {
-            view.displayError("Invalid ID. Please enter a number.");
-            return;
-        }
-
-        Performance p = null;
-        for (Event e : events) {
-            p = e.getPerformanceById(performanceID);
-            if (p != null) {
+        long performanceID = -1;
+        while (true) {
+            String performanceIDInput = view.getInput("Enter performance ID of performance you wish to sponsor:");
+            try {
+                performanceID = Long.parseLong(performanceIDInput.trim());
                 break;
+            } catch (NumberFormatException e) {
+                view.displayError("Invalid ID. Please enter a number.");
             }
         }
+
+        Performance p = getPerformanceByID(performanceID);
 
         if (p == null) {
             view.displayError("Performance does not exist.");
@@ -259,13 +316,15 @@ public class EventPerformanceController extends Controller {
             return;
         }
 
-        String amountInput = view.getInput("Enter sponsorship amount: ");
-        double amount;
-        try {
-            amount = Double.parseDouble(amountInput.trim());
-        } catch (NumberFormatException e) {
-            view.displayError("Invalid format. Please enter a number.");
-            return;
+        double amount = 0;
+        while (true) {
+            String amountInput = view.getInput("Enter sponsorship amount: ");
+            try {
+                amount = Double.parseDouble(amountInput.trim());
+                break;
+            } catch (NumberFormatException e) {
+                view.displayError("Invalid format. Please enter a number.");
+            }
         }
 
         if (amount <= 0) {

@@ -8,7 +8,6 @@ import java.time.LocalDate;
 
 
 public class Event {
-    private static long nextEventId = 1;
 
     private final long eventID;
     private String title;
@@ -25,13 +24,13 @@ public class Event {
      * @param type       what type of event it is
      * @param isTicketed whether the event is ticketed
      */
-    public Event(String title, EventType type, boolean isTicketed,
+    public Event(long eventID, String title, EventType type, boolean isTicketed,
                  EntertainmentProvider organiser) {
         assert title != null : "Title cannot be null";
         assert type != null : "Type cannot be null";
         assert organiser != null : "Organiser cannot be null";
 
-        this.eventID = nextEventId++;
+        this.eventID = eventID;
         this.title = title;
         this.type = type;
         this.isTicketed = isTicketed;
@@ -90,7 +89,7 @@ public class Event {
      * @param ticketPrice        price of the tickets
      * @return the performance added
      */
-    public Performance createPerformance(LocalDateTime startDateTime, LocalDateTime endDateTime,
+    public Performance createPerformance(long performanceID, LocalDateTime startDateTime, LocalDateTime endDateTime,
                                          List<String> performerNames,
                                          String venueAddress, int venueCapacity, boolean venueIsOutdoors,
                                          boolean venueAllowsSmoking, int numTickets, double ticketPrice) {
@@ -104,7 +103,7 @@ public class Event {
         assert ticketPrice > 0 : "Ticket price cannot be negative";
 
 
-        Performance p = new Performance(startDateTime, endDateTime,
+        Performance p = new Performance(performanceID, startDateTime, endDateTime,
                 performerNames, venueAddress, venueCapacity, venueIsOutdoors,
                 venueAllowsSmoking, numTickets, ticketPrice, new ArrayList<>(), this);
         performances.add(p);
@@ -217,13 +216,6 @@ public class Event {
      */
     public void addPerformance(Performance p){
         performances.add(p);
-    }
-
-    /**
-     * Resets the event ID counter. For testing purposes only.
-     */
-    public static void resetEventIDCounter() {
-        nextEventId = 1;
     }
 
     /**

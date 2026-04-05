@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Performance {
-    private static long nextPerformanceId = 1;
 
     private long performanceId;
     private LocalDateTime startDateTime;
@@ -40,7 +39,7 @@ public class Performance {
      * @param bookings              initial list of bookings (may be empty)
      * @param event                 the event the performance belongs to
      */
-    public Performance(LocalDateTime startDateTime, LocalDateTime endDateTime,
+    public Performance(long performanceId, LocalDateTime startDateTime, LocalDateTime endDateTime,
                        List<String> performerNames, String venueAddress, int venueCapacity,
                        boolean venueIsOutdoors, boolean venueAllowsSmoking, int numTicketsTotal,
                        double ticketPrice, List<Booking> bookings, Event event) {
@@ -50,7 +49,7 @@ public class Performance {
         assert numTicketsTotal <= venueCapacity
                 : "Number of tickets must be less than or equal to venueCapacity";
 
-        this.performanceId = nextPerformanceId++;
+        this.performanceId = performanceId;
         this.startDateTime = startDateTime;
         this.endDateTime = endDateTime;
         this.performerNames = performerNames;
@@ -169,16 +168,6 @@ public class Performance {
      *
      * @return if the performance is sponsored
      */
-    public boolean getIsSponsored() {
-        return isSponsored;
-    }
-
-    /**
-     * Returns whether or not the performance is sponsored.
-     * Alias for {@link #getIsSponsored()}.
-     *
-     * @return if the performance is sponsored
-     */
     public boolean isSponsored() {
         return isSponsored;
     }
@@ -263,7 +252,7 @@ public class Performance {
      * @return the final ticket price
      */
     public double getFinalTicketPrice() {
-        if (getIsSponsored()) {
+        if (isSponsored()) {
             return getTicketPrice() - getSponsoredAmount();
         }
         return getTicketPrice();
@@ -373,13 +362,6 @@ public class Performance {
     public void addBooking(Booking b) {
         bookings.add(b);
         numTicketsSold += b.getNumTickets();
-    }
-
-    /**
-     * Resets the performance ID counter. For testing purposes only.
-     */
-    public static void resetPerformanceIDCounter() {
-        nextPerformanceId = 1;
     }
 
     /**

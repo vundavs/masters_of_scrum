@@ -217,12 +217,6 @@ public class UserController extends Controller {
         }
     }
 
-    /**
-     * Finds the entertainment provider who owns the event with the given number.
-     *
-     * @param eventNumber the ID of the event to search for
-     * @return the EntertainmentProvider who owns the event, or null if not found
-     */
     private EntertainmentProvider getEntertainmentProviderOwningEvent(long eventNumber) {
         for (User user : users) {
             if (user instanceof EntertainmentProvider) {

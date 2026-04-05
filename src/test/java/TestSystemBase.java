@@ -46,6 +46,11 @@ public abstract class TestSystemBase {
     protected List<Booking> bookings;
     protected List<Event> events;
 
+    /** Counter for assigning unique event IDs in test helpers. */
+    protected long nextTestEventId = 1;
+    /** Counter for assigning unique performance IDs in test helpers. */
+    protected long nextTestPerfId = 1;
+
     /** Pre-registered student 1 — email: {@code student1@uni.ac.uk}, password: {@code pass1} */
     protected Student student1;
     /** Pre-registered student 2 — email: {@code student2@uni.ac.uk}, password: {@code pass2} */
@@ -62,6 +67,8 @@ public abstract class TestSystemBase {
         performances = new ArrayList<>();
         bookings = new ArrayList<>();
         events = new ArrayList<>();
+        nextTestEventId = 1;
+        nextTestPerfId = 1;
 
         MockPaymentSystem paymentSystem = new MockPaymentSystem();
         MockVerificationService verificationService = new MockVerificationService();
@@ -78,8 +85,6 @@ public abstract class TestSystemBase {
         userController.addUser(student1);
         userController.addUser(student2);
         userController.addUser(new AdminStaff("admin@uni.ac.uk", "adminpass", "Admin User"));
-
-        Booking.resetBookingNumberCounter();
     }
 
     /**
@@ -109,11 +114,12 @@ public abstract class TestSystemBase {
      * @return the created Performance
      */
     protected Performance createFuturePerformance(EntertainmentProvider ep) {
-        Event event = new Event("Test Concert", EventType.MUSIC, true, ep);
+        Event event = new Event(nextTestEventId++, "Test Concert", EventType.MUSIC, true, ep);
         events.add(event);
         ep.addEvent(event);
 
         Performance p = new Performance(
+                nextTestPerfId++,
                 LocalDateTime.now().plusDays(7),
                 LocalDateTime.now().plusDays(7).plusHours(2),
                 List.of("Band"),
@@ -132,11 +138,12 @@ public abstract class TestSystemBase {
      * @return the created Performance
      */
     protected Performance createPastPerformance(EntertainmentProvider ep) {
-        Event event = new Event("Past Concert", EventType.MUSIC, true, ep);
+        Event event = new Event(nextTestEventId++, "Past Concert", EventType.MUSIC, true, ep);
         events.add(event);
         ep.addEvent(event);
 
         Performance p = new Performance(
+                nextTestPerfId++,
                 LocalDateTime.now().minusDays(7),
                 LocalDateTime.now().minusDays(7).plusHours(2),
                 List.of("Band"),

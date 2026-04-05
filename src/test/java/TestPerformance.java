@@ -1,5 +1,4 @@
 import model.Booking;
-import model.BookingStatus;
 import model.EntertainmentProvider;
 import model.Event;
 import model.EventType;
@@ -28,16 +27,14 @@ public class TestPerformance {
 
     @BeforeEach
     void setUp() {
-        Performance.resetPerformanceIDCounter();
-        Booking.resetBookingNumberCounter();
-
         ep = new EntertainmentProvider("ep@test.com", "pass", "Music Co",
                 "1234567890", "John", "Live music");
 
-        ticketedEvent = new Event("Test Concert", EventType.MUSIC, true, ep);
-        nonTicketedEvent = new Event("Free Show", EventType.DANCE, false, ep);
+        ticketedEvent = new Event(1L, "Test Concert", EventType.MUSIC, true, ep);
+        nonTicketedEvent = new Event(2L, "Free Show", EventType.DANCE, false, ep);
 
         futurePerformance = new Performance(
+                1L,
                 LocalDateTime.now().plusDays(7),
                 LocalDateTime.now().plusDays(7).plusHours(2),
                 List.of("Band A"),
@@ -45,6 +42,7 @@ public class TestPerformance {
                 100, 20.0, new ArrayList<>(), ticketedEvent);
 
         pastPerformance = new Performance(
+                2L,
                 LocalDateTime.now().minusDays(7),
                 LocalDateTime.now().minusDays(7).plusHours(2),
                 List.of("Band B"),
@@ -78,6 +76,7 @@ public class TestPerformance {
     @Test
     void testCheckIfEventIsTicketedReturnsFalse() {
         Performance nonTicketed = new Performance(
+                3L,
                 LocalDateTime.now().plusDays(1),
                 LocalDateTime.now().plusDays(1).plusHours(1),
                 List.of("Dancer"),
@@ -104,7 +103,7 @@ public class TestPerformance {
     @Test
     void testCheckIfTicketsLeftWhenNoneLeft() {
         Student student = new Student("s@uni.ac.uk", "pass", "Alice", 111111111);
-        Booking booking = new Booking(student, futurePerformance, 100, 2000.0);
+        Booking booking = new Booking(1L, student, futurePerformance, 100, 2000.0);
         futurePerformance.addBooking(booking);
         assertFalse(futurePerformance.checkIfTicketsLeft(1),
                 "Should return false when no tickets remain");
@@ -113,7 +112,7 @@ public class TestPerformance {
     @Test
     void testCheckIfTicketsLeftAfterPartialSale() {
         Student student = new Student("s@uni.ac.uk", "pass", "Alice", 111111111);
-        Booking booking = new Booking(student, futurePerformance, 50, 1000.0);
+        Booking booking = new Booking(1L, student, futurePerformance, 50, 1000.0);
         futurePerformance.addBooking(booking);
         assertTrue(futurePerformance.checkIfTicketsLeft(50),
                 "Should return true when exactly half tickets remain");
@@ -177,7 +176,7 @@ public class TestPerformance {
     @Test
     void testHasActiveBookingsWhenActiveBookingExists() {
         Student student = new Student("s@uni.ac.uk", "pass", "Alice", 111111111);
-        Booking booking = new Booking(student, futurePerformance, 2, 40.0);
+        Booking booking = new Booking(1L, student, futurePerformance, 2, 40.0);
         futurePerformance.addBooking(booking);
         assertTrue(futurePerformance.hasActiveBookings(),
                 "Should return true when an active booking exists");
@@ -186,7 +185,7 @@ public class TestPerformance {
     @Test
     void testHasActiveBookingsWhenBookingCancelled() {
         Student student = new Student("s@uni.ac.uk", "pass", "Alice", 111111111);
-        Booking booking = new Booking(student, futurePerformance, 2, 40.0);
+        Booking booking = new Booking(1L, student, futurePerformance, 2, 40.0);
         futurePerformance.addBooking(booking);
         booking.cancelByStudent();
         assertFalse(futurePerformance.hasActiveBookings(),
@@ -198,7 +197,7 @@ public class TestPerformance {
     @Test
     void testSponsorSetsIsSponsoredTrue() {
         futurePerformance.sponsor(10.0);
-        assertTrue(futurePerformance.getIsSponsored(),
+        assertTrue(futurePerformance.isSponsored(),
                 "isSponsored should be true after sponsoring");
     }
 
@@ -244,7 +243,7 @@ public class TestPerformance {
     @Test
     void testAddBookingIncreasesTicketsSold() {
         Student student = new Student("s@uni.ac.uk", "pass", "Alice", 111111111);
-        Booking booking = new Booking(student, futurePerformance, 3, 60.0);
+        Booking booking = new Booking(1L, student, futurePerformance, 3, 60.0);
         futurePerformance.addBooking(booking);
         assertEquals(3, futurePerformance.getNumTicketsSold(),
                 "Tickets sold should increase by the number of tickets in the booking");
@@ -253,7 +252,7 @@ public class TestPerformance {
     @Test
     void testAddBookingAppearsInActiveBookings() {
         Student student = new Student("s@uni.ac.uk", "pass", "Alice", 111111111);
-        Booking booking = new Booking(student, futurePerformance, 2, 40.0);
+        Booking booking = new Booking(1L, student, futurePerformance, 2, 40.0);
         futurePerformance.addBooking(booking);
         assertTrue(futurePerformance.hasActiveBookings(),
                 "Performance should show active bookings after addBooking");

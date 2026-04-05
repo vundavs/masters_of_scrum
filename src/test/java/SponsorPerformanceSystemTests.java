@@ -36,11 +36,12 @@ public class SponsorPerformanceSystemTests extends TestSystemBase {
      * @return the created Performance
      */
     private Performance createNonTicketedPerformance(EntertainmentProvider ep) {
-        Event event = new Event("Free Concert", EventType.MUSIC, false, ep);
+        Event event = new Event(nextTestEventId++, "Free Concert", EventType.MUSIC, false, ep);
         events.add(event);
         ep.addEvent(event);
 
         Performance p = new Performance(
+                nextTestPerfId++,
                 LocalDateTime.now().plusDays(7),
                 LocalDateTime.now().plusDays(7).plusHours(2),
                 List.of("Band"),
@@ -66,7 +67,7 @@ public class SponsorPerformanceSystemTests extends TestSystemBase {
         view.addInputs(String.valueOf(p.getPerformanceId()), "15.0");
         epController.sponsorPerformance();
 
-        assertTrue(p.getIsSponsored(),
+        assertTrue(p.isSponsored(),
                 "Performance should be marked as sponsored");
         assertEquals(15.0, p.getSponsoredAmount(),
                 "Sponsored amount should be set to 15.0");
@@ -172,7 +173,8 @@ public class SponsorPerformanceSystemTests extends TestSystemBase {
         registerEP(view);
         loginAsAdmin("admin@uni.ac.uk", "adminpass", view);
 
-        view.addInputs("abc", "15.0");
+        // "abc" triggers format-error retry; "99999" is a valid long but non-existent (semantic exit)
+        view.addInputs("abc", "99999");
         epController.sponsorPerformance();
 
         assertTrue(view.hasErrorContaining("Invalid"),
@@ -196,7 +198,7 @@ public class SponsorPerformanceSystemTests extends TestSystemBase {
 
         assertTrue(view.hasErrorContaining("non ticketed"),
                 "Error should state that the performance cannot be sponsored");
-        assertFalse(p.getIsSponsored(),
+        assertFalse(p.isSponsored(),
                 "Non-ticketed performance should not be marked as sponsored");
     }
 
@@ -217,7 +219,7 @@ public class SponsorPerformanceSystemTests extends TestSystemBase {
 
         assertTrue(view.hasErrorContaining("invalid"),
                 "Error should state that the amount is invalid");
-        assertFalse(p.getIsSponsored(),
+        assertFalse(p.isSponsored(),
                 "Performance should not be sponsored when amount exceeds ticket price");
     }
 
@@ -236,7 +238,7 @@ public class SponsorPerformanceSystemTests extends TestSystemBase {
 
         assertTrue(view.hasErrorContaining("invalid"),
                 "Error should state that the amount is invalid");
-        assertFalse(p.getIsSponsored(),
+        assertFalse(p.isSponsored(),
                 "Performance should not be sponsored with a zero amount");
     }
 
@@ -255,7 +257,7 @@ public class SponsorPerformanceSystemTests extends TestSystemBase {
 
         assertTrue(view.hasErrorContaining("invalid"),
                 "Error should state that the amount is invalid");
-        assertFalse(p.getIsSponsored(),
+        assertFalse(p.isSponsored(),
                 "Performance should not be sponsored with a negative amount");
     }
 
@@ -269,12 +271,13 @@ public class SponsorPerformanceSystemTests extends TestSystemBase {
         Performance p = futureTicketedPerformance(ep);
 
         loginAsAdmin("admin@uni.ac.uk", "adminpass", view);
-        view.addInputs(String.valueOf(p.getPerformanceId()), "abc");
+        // "abc" triggers format-error retry; "999.0" exceeds ticket price (semantic exit)
+        view.addInputs(String.valueOf(p.getPerformanceId()), "abc", "999.0");
         epController.sponsorPerformance();
 
         assertTrue(view.hasErrorContaining("Invalid"),
                 "Error should state that the sponsorship amount is invalid");
-        assertFalse(p.getIsSponsored(),
+        assertFalse(p.isSponsored(),
                 "Performance should not be sponsored after invalid amount input");
     }
 }
