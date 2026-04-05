@@ -102,6 +102,7 @@ public class CancelPerformanceSystemTests extends TestSystemBase {
         Performance p = createFuturePerformance(ep1);
 
         // Register a second EP
+        userController.setCurrentUser(null);
         view.addInputs("ep2@other.com", "ep2pass", "Other Co",
                 "0987654321", "Jane", "Other events");
         userController.registerEntertainmentProvider();
