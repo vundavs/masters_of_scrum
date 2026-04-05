@@ -10,7 +10,6 @@ import external.PaymentSystem;
 import view.View;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.Collection;
 import java.util.List;
@@ -31,11 +30,15 @@ public class EventPerformanceController extends Controller {
      * Creates a new EventPerformanceController.
      *
      * @param view         the view for user interaction
+     * @param events       shared list of all events
      * @param performances shared list of all performances
+     * @param paymentSystem the payment system for processing refunds
      */
-    public EventPerformanceController(View view, List<Performance> performances) {
+    public EventPerformanceController(View view, List<Event> events, List<Performance> performances, PaymentSystem paymentSystem) {
         this.view = view;
+        this.events = events;
         this.performances = performances;
+        this.paymentSystem = paymentSystem;
     }
 
     /**
@@ -61,11 +64,16 @@ public class EventPerformanceController extends Controller {
         }
 
 
+        boolean found = false;
         for (Event e : events) {
             Collection<String> results = e.getInfoOfPerformancesOnDate(searchDate);
             for (String s : results) {
                 view.displaySuccess(s);
+                found = true;
             }
+        }
+        if (!found) {
+            view.displayError("No performances found for given date.");
         }
     }
 
@@ -132,6 +140,7 @@ public class EventPerformanceController extends Controller {
         isTicketedInput = isTicketedInput.toLowerCase().trim();
         if (!isTicketedInput.equals("true") && !isTicketedInput.equals("false")) {
             view.displayError("Invalid input, please enter 'true' or 'false'.");
+            return null;
         }
         boolean isTicketed = Boolean.parseBoolean(isTicketedInput);
 
@@ -161,13 +170,16 @@ public class EventPerformanceController extends Controller {
         }
 
         Performance performance = null;
-        for (Event e : events){
+        for (Event e : events) {
             performance = e.getPerformanceById(performanceID);
-            if (performance == null) {
-                view.displayError("Performance with given number does not exist.");
-                return;
+            if (performance != null) {
+                break;
             }
-            }
+        }
+        if (performance == null) {
+            view.displayError("Performance with given number does not exist.");
+            return;
+        }
 
         EntertainmentProvider ep = (EntertainmentProvider) currentUser;
         if (!performance.checkCreatedByEP(ep.getEmail())) {
@@ -238,7 +250,12 @@ public class EventPerformanceController extends Controller {
         }
 
         if (p == null) {
-            view.displayError("Performance not found.");
+            view.displayError("Performance does not exist.");
+            return;
+        }
+
+        if (!p.checkIfEventIsTicketed()) {
+            view.displayError("Cannot sponsor a non ticketed performance.");
             return;
         }
 
@@ -251,8 +268,13 @@ public class EventPerformanceController extends Controller {
             return;
         }
 
+        if (amount <= 0) {
+            view.displayError("Sponsorship amount is invalid.");
+            return;
+        }
+
         if (!checkIfSponsorshipPossible(p, amount)) {
-            view.displayError("Sponsorship amount exceeds ticket price.");
+            view.displayError("Sponsorship amount is invalid.");
             return;
         }
 
