@@ -41,7 +41,6 @@ public class BookingController extends Controller {
      * Gets performance ID and ticket count, processes payment, creates a booking.
      */
     public void bookPerformance() {
-        assert checkCurrentUserIsStudent() : "Must be logged in as a student";
         if (!checkCurrentUserIsStudent()) {
             view.displayError("You must be logged in as a student to book.");
             return;
@@ -123,7 +122,6 @@ public class BookingController extends Controller {
      * Gets booking number from user, processes refund, cancels booking.
      */
     public void cancelBooking() {
-        assert checkCurrentUserIsStudent() : "Must be logged in as a student";
         if (!checkCurrentUserIsStudent()) {
             view.displayError("You must be logged in as a student.");
             return;
@@ -182,7 +180,6 @@ public class BookingController extends Controller {
      * Student must have an active booking for a past performance.
      */
     public void reviewPerformance() {
-        assert checkCurrentUserIsStudent() : "Must be logged in as a student";
         if (!checkCurrentUserIsStudent()) {
             view.displayError("You must be logged in as a student.");
             return;
@@ -279,4 +276,42 @@ public class BookingController extends Controller {
         }
         return null;
     }
+
+    /**
+     * Adds a booking to the shared bookings list.
+     *
+     * @param b the booking to add
+     */
+    private void addBooking(Booking b) {
+        bookings.add(b);
+    }
+
+    /**
+     * Checks whether a booking is possible for the given performance and ticket count.
+     *
+     * @param performance the performance to check
+     * @param numTickets  the number of tickets requested
+     * @return true if the performance is ticketed and has enough tickets left
+     */
+    private boolean checkIfBookingPossible(Performance performance, int numTickets) {
+        return performance.checkIfEventIsTicketed()
+                && performance.checkIfTicketsLeft(numTickets);
+    }
+
+    /**
+     * Finds all bookings associated with the given event ID.
+     *
+     * @param eventID the event ID to search for
+     * @return a collection of matching bookings
+     */
+    private java.util.Collection<Booking> findBookingsByEventID(long eventID) {
+        java.util.List<Booking> result = new java.util.ArrayList<>();
+        for (Booking b : bookings) {
+            if (b.getPerformance().getPerformanceId() == eventID) {
+                result.add(b);
+            }
+        }
+        return result;
+    }
 }
+

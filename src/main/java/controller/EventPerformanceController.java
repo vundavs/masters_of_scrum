@@ -1,10 +1,15 @@
 package controller;
 
+import model.EntertainmentProvider;
 import model.Performance;
+import model.Event;
+import model.EventType;
 import view.View;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -14,7 +19,8 @@ import java.util.List;
  */
 public class EventPerformanceController extends Controller {
 
-    private final List<Performance> performances;
+    private List<Event> events;
+    private List<Performance> performances;
 
     /**
      * Creates a new EventPerformanceController.
@@ -31,11 +37,29 @@ public class EventPerformanceController extends Controller {
      * Handles the search for performances by date use case.
      */
     public void searchForPerformances() {
-        LocalDate date searchDateTime = (LocalDateTime) view.getInput("Enter date to search for performances");
+        String dateInput = view.getInput("Enter date to search for performances in yyyy-MM-dd format");
+        LocalDate searchDate = null;
+        try {
+            searchDate = LocalDate.parse(dateInput.trim());
+        } catch (DateTimeParseException e) {
+            view.displayError("Invalid date format. Must be in yyyy-MM-dd format.");
+            return;
+        }
+
+        if(searchDate.isBefore(LocalDate.now())) {
+            view.displayError("This date has already passed.");
+        }
+
+        if(searchDate == null) {
+            view.displayError("No performances found for given date.");
+            return;
+        }
+
+
         for (Event e : events) {
-            Collection<String> results = e.getInfoOfPerformancesOnDate(LocalDateTime searchDateTime);
+            Collection<String> results = e.getInfoOfPerformancesOnDate(searchDate);
             for (String s : results) {
-                System.out.println(s);
+                view.displaySuccess(s);
             }
         }
     }
@@ -44,90 +68,198 @@ public class EventPerformanceController extends Controller {
      * Handles the view performance use case.
      */
     public void viewPerformance() {
-        long performanceID = (long) view.getInput("Enter performance ID to view: ");
-        Performance p = getPerformanceByID(performanceID);
+        if (checkCurrentUserIsGuest()) {
+            view.displayError("You must be logged in to view performances.");
+        }
+
+        String input = view.getInput("Enter performance ID to view: ");
+
+        long performanceID;
+        try {
+            performanceID = Long.parseLong(input.trim());
+        } catch (NumberFormatException e) {
+            view.displayError("Invalid ID. Please enter a number.");
+            return;
+        }
+
+        Performance p = null;
+        for (Event e : events) {
+            p = e.getPerformanceById(performanceID);
+            if (p != null) {
+                break;
+            }
+        }
         if (p == null) {
             view.displayError("Performance not found.");
             return;
         }
-        System.out.println(p.toString());
+        Event e = p.getEvent();
+        view.displaySuccess(e.performanceFormat(p));
     }
+
 
     /**
      * Handles the create event use case for entertainment providers.
      */
     public Event createEvent() {
-        if(!checkCurrentUserIsEntertainmentProvider()) {
+        if (!checkCurrentUserIsEntertainmentProvider()) {
             view.displayError("Only entertainment providers can create events.");
             return null;
         }
+
         String title = (String) view.getInput("Enter event title: ");
-        EventType type = (EventType) view.getInput("Enter event type: ");
-        boolean isTicketed = (boolean) view.getInput("Is the event ticketed? (true/false)");
+        title = title.trim();
+        if(title.isEmpty()) {
+            view.displayError("Title cannot be empty.");
+            return null;
+        }
+
+        String typeInput = view.getInput("Enter event type (MUSIC, THEATRE, DANCE, MOVIE, OR SPORTS): ");
+        EventType type;
+        try {
+            type = EventType.valueOf(typeInput.trim().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            view.displayError("Invalid event type. Please enter a valid event type.");
+            return null;
+        }
+
+        String isTicketedInput = view.getInput("Is the event ticketed? (true/false)");
+        isTicketedInput = isTicketedInput.toLowerCase().trim();
+        if (!isTicketedInput.equals("true") && !isTicketedInput.equals("false")) {
+            view.displayError("Invalid input, please enter 'true' or 'false'.");
+        }
+        boolean isTicketed = Boolean.parseBoolean(isTicketedInput);
 
         EntertainmentProvider organiser = (EntertainmentProvider) getCurrentUser();
         Event e = new Event(title, type, isTicketed, organiser);
         events.add(e);
+        view.displaySuccess("Event created successfully.");
         return e;
     }
 
     /**
      * Handles the cancel performance use case for entertainment providers.
-     * TODO: paste in from sahasra
      */
     public void cancelPerformance() {
-        // TODO: implement cancel performance
-        view.displayError("Cancel performance not yet implemented.");
+        if (!checkCurrentUserIsEntertainmentProvider()) {
+            view.displayError("You must be logged in as an entertainment provider.");
+            return;
+        }
+
+        String input = view.getInput("Enter performance ID to cancel:");
+        long performanceID;
+        try {
+            performanceID = Long.parseLong(input.trim());
+        } catch (NumberFormatException e) {
+            view.displayError("Invalid performance ID.");
+            return;
+        }
+
+        Performance performance = getPerformanceByID(performanceID);
+        if (performance == null) {
+            view.displayError("Performance with given number does not exist.");
+            return;
+        }
+
+        EntertainmentProvider ep = (EntertainmentProvider) currentUser;
+        if (!performance.checkCreatedByEP(ep.getEmail())) {
+            view.displayError("This performance does not belong to you.");
+            return;
+        }
+
+        if (!performance.checkHasNotHappenedYet()) {
+            view.displayError("Performance can't be cancelled as it has already happened.");
+            return;
+        }
+
+        if (performance.hasActiveBookings()) {
+            String organiserMessage = view.getInput("Enter a cancellation message for affected students:");
+            while (organiserMessage == null || organiserMessage.trim().isEmpty()) {
+                view.displayError("Please provide a non-empty message for the students.");
+                organiserMessage = view.getInput("Enter a cancellation message for affected students:");
+            }
+
+            for (Booking b : performance.getBookings()) {
+                if (b.getStatus() == BookingStatus.ACTIVE) {
+                    boolean refundSuccessful = paymentSystem.processRefund(
+                            b.getNumTickets(),
+                            performance.getEventTitle(),
+                            b.getStudent().getEmail(),
+                            b.getStudent().getPhoneNumber(),
+                            performance.getOrganiserEmail(),
+                            b.getAmountPaid(),
+                            organiserMessage);
+
+                    if (!refundSuccessful) {
+                        view.displayError("There was an issue with a refund. The performance cannot be cancelled.");
+                        return;
+                    }
+                    b.cancelByProvider();
+                }
+            }
+        }
+
+        performance.cancel();
+        view.displaySuccess("Cancellation Successful!");
     }
 
     /**
      * Handles the sponsor performance use case for admin staff.
      */
     public void sponsorPerformance() {
-        if(!checkCurrentUserIsAdmin()) {
+        if (!checkCurrentUserIsAdmin()) {
             view.displayError("Only admin staff can sponsor performances.");
             return;
         }
 
-        long performanceID = (long) view.getInput("Enter performance ID to sponsor: ");
-        Performance p = getPerformanceByID(performanceID);
+        String performanceIDInput = view.getInput("Enter performance ID of performance you wish to sponsor:");
+        long performanceID;
+        try {
+            performanceID = Long.parseLong(performanceIDInput.trim());
+        } catch (NumberFormatException e) {
+            view.displayError("Invalid ID. Please enter a number.");
+            return;
+        }
+
+        Performance p = null;
+        for (Event e : events) {
+            p = e.getPerformanceById(performanceID);
+            if (p != null) {
+                break;
+            }
+        }
 
         if (p == null) {
             view.displayError("Performance not found.");
             return;
         }
 
-        double amount = (double) view.getInput("Enter sponsorship amount: ");
+        String amountInput = view.getInput("Enter sponsorship amount: ");
+        double amount;
+        try {
+            amount = Double.parseDouble(amountInput.trim());
+        } catch (NumberFormatException e) {
+            view.displayError("Invalid format. Please enter a number.");
+            return;
+        }
 
-        if (!checkIfSponsorshipPossible(Performance p, int amount)) {
+        if (!checkIfSponsorshipPossible(p, amount)) {
             view.displayError("Sponsorship amount exceeds ticket price.");
             return;
         }
 
-        if(getIsSponsored()) {
+        if (p.isSponsored()) {
             view.displayError("Performance has already been sponsored.");
             return;
         }
 
         p.sponsor(amount);
-        System.out.println("Performance sponsored successfully.");
-    }
-    }
-
-
-    private boolean checkIfSponsorshipPossible(Performance performance, int amount) {
-        return (amount <= performance.getTicketPrice();
+        view.displaySuccess("Performance sponsored successfully.");
     }
 
 
-    /**
-     * overrides java's toString() method for better formatting
-     *
-     * @return string in correct format
-     */
-    @Override
-    public String toString() {
-        return "Performance{id=" + performanceID + ", venue='" + venueAddress +
-                "', start=" + startDateTime + ", status=" + status + "}";
+    private boolean checkIfSponsorshipPossible(Performance performance, double amount) {
+        return (amount <= performance.getTicketPrice());
     }
+
 }

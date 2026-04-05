@@ -3,6 +3,7 @@ package controller;
 import external.PaymentSystem;
 import external.VerificationService;
 import model.Booking;
+import model.Event;
 import model.Performance;
 import model.User;
 import view.View;
@@ -64,6 +65,9 @@ public class MenuController extends Controller {
     private final EventPerformanceController eventPerformanceController;
     private final BookingController bookingController;
 
+    /** Shared list of all events in the system. */
+    private final List<Event> events;
+
     /**
      * Shared list of performances: initialised here and passed to both
      * EventPerformanceController and BookingController so they operate on
@@ -92,6 +96,7 @@ public class MenuController extends Controller {
         assert verificationService != null : "VerificationService must not be null";
 
         this.view = view;
+        this.events = new ArrayList<>();
         this.performances = new ArrayList<>();
         this.bookings = new ArrayList<>();
 
@@ -99,7 +104,8 @@ public class MenuController extends Controller {
         this.userController = new UserController(paymentSystem, verificationService);
         this.userController.view = view;
 
-        this.eventPerformanceController = new EventPerformanceController(view, performances);
+        this.eventPerformanceController = new EventPerformanceController(
+                view, events, performances, paymentSystem);
 
         this.bookingController = new BookingController(paymentSystem, view, performances, bookings);
     }
