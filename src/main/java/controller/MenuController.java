@@ -101,7 +101,7 @@ public class MenuController extends Controller {
         this.bookings = new ArrayList<>();
 
         // Wire sub-controllers, sharing the same view and collections
-        this.userController = new UserController(paymentSystem, verificationService);
+        this.userController = new UserController(verificationService);
         this.userController.view = view;
 
         this.eventPerformanceController = new EventPerformanceController(

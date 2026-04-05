@@ -18,10 +18,6 @@ import java.util.List;
 public class UserController extends Controller {
 
     private List<User> users = new ArrayList<>();
-    private List<Event> events = new ArrayList<>();
-    private List<Booking> bookings = new ArrayList<>();
-
-    private final PaymentSystem paymentSystem;
     private final VerificationService verificationService;
 
     private static final String PREREGISTERED_USERS_FILE_PATH = "src/main/resources/preregistered_users.csv";
@@ -34,8 +30,7 @@ public class UserController extends Controller {
      * @param paymentSystem       the payment system to use
      * @param verificationService the verification service to use
      */
-    public UserController(PaymentSystem paymentSystem, VerificationService verificationService) {
-        this.paymentSystem = paymentSystem;
+    public UserController(VerificationService verificationService) {
         this.verificationService = verificationService;
         addPreregisteredUsers();
     }

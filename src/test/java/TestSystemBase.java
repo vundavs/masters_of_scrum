@@ -73,7 +73,7 @@ public abstract class TestSystemBase {
         MockPaymentSystem paymentSystem = new MockPaymentSystem();
         MockVerificationService verificationService = new MockVerificationService();
 
-        userController = new UserController(paymentSystem, verificationService);
+        userController = new UserController(verificationService);
         userController.setView(view);
 
         epController = new EventPerformanceController(view, events, performances, paymentSystem);
