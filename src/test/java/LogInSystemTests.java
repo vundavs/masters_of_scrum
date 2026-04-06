@@ -24,8 +24,10 @@ public class LogInSystemTests extends TestSystemBase {
 
         view.addInputs("student1@uni.ac.uk", "pass1");
         userController.login();
-        assertTrue(view.hasSuccessContaining("Successfully logged in."));
-        assertInstanceOf(Student.class, userController.getCurrentUser());
+        assertTrue(view.hasSuccessContaining("Successfully logged in."),
+                "User should have successfully logged in");
+        assertInstanceOf(Student.class, userController.getCurrentUser(),
+                "Current user should be a Student.");
     }
 
     /**
@@ -39,8 +41,10 @@ public class LogInSystemTests extends TestSystemBase {
 
         view.addInputs("admin@uni.ac.uk", "adminpass");
         userController.login();
-        assertTrue(view.hasSuccessContaining("Successfully logged in."));
-        assertInstanceOf(AdminStaff.class, userController.getCurrentUser());
+        assertTrue(view.hasSuccessContaining("Successfully logged in."),
+                "User should have successfully logged in");
+        assertInstanceOf(AdminStaff.class, userController.getCurrentUser(),
+                "Current user should be of type AdminStaff");
     }
 
     /**
@@ -54,8 +58,10 @@ public class LogInSystemTests extends TestSystemBase {
 
         view.addInputs("student1@uni.ac.uk", "wrongpassword");
         userController.login();
-        assertTrue(view.hasErrorContaining("Incorrect email and/or password."));
-        assertNull(userController.getCurrentUser());
+        assertTrue(view.hasErrorContaining("Incorrect email and/or password."),
+                "User should not have been able to login.");
+        assertNull(userController.getCurrentUser(),
+                "Current user should be null.");
     }
 
     /**
@@ -69,8 +75,10 @@ public class LogInSystemTests extends TestSystemBase {
 
         view.addInputs("wrongemail@uni.ac.uk", "pass1");
         userController.login();
-        assertTrue(view.hasErrorContaining("Incorrect email and/or password."));
-        assertNull(userController.getCurrentUser());
+        assertTrue(view.hasErrorContaining("Incorrect email and/or password."),
+                "User should not have been able to login.");
+        assertNull(userController.getCurrentUser(),
+                "Current user should be null.");
     }
 
     /**
@@ -88,7 +96,8 @@ public class LogInSystemTests extends TestSystemBase {
 
         // Try to login again
         userController.login();
-        assertTrue(view.hasErrorContaining("Already logged in."));
+        assertTrue(view.hasErrorContaining("Already logged in."),
+                "User should not be able to login twice.");
     }
 
     /**
@@ -108,7 +117,9 @@ public class LogInSystemTests extends TestSystemBase {
         // Login as EP
         view.addInputs("ep@musicco.com", "eppass");
         userController.login();
-        assertTrue(view.hasSuccessContaining("Successfully logged in."));
-        assertInstanceOf(EntertainmentProvider.class, userController.getCurrentUser());
+        assertTrue(view.hasSuccessContaining("Successfully logged in."),
+                "EP should be able to log in.");
+        assertInstanceOf(EntertainmentProvider.class, userController.getCurrentUser(),
+                "Current user should be of type EntertainmentProvider");
     }
 }

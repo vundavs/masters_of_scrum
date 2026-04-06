@@ -26,8 +26,10 @@ public class LogOutSystemTests extends TestSystemBase {
 
         // Then logout
         userController.logout();
-        assertTrue(view.hasSuccessContaining("Logged out."));
-        assertNull(userController.getCurrentUser());
+        assertTrue(view.hasSuccessContaining("Logged out."),
+                "User should be able to logout.");
+        assertNull(userController.getCurrentUser(),
+                "Current user should be null.");
     }
 
     /**
@@ -45,8 +47,10 @@ public class LogOutSystemTests extends TestSystemBase {
 
         // Then logout
         userController.logout();
-        assertTrue(view.hasSuccessContaining("Logged out."));
-        assertNull(userController.getCurrentUser());
+        assertTrue(view.hasSuccessContaining("Logged out."),
+                "User should bne able to logout.");
+        assertNull(userController.getCurrentUser(),
+                "Current user should be null.");
     }
 
     /**
@@ -69,8 +73,10 @@ public class LogOutSystemTests extends TestSystemBase {
 
         // Then logout
         userController.logout();
-        assertTrue(view.hasSuccessContaining("Logged out."));
-        assertNull(userController.getCurrentUser());
+        assertTrue(view.hasSuccessContaining("Logged out."),
+                "EP should be able to logout.");
+        assertNull(userController.getCurrentUser(),
+                "Current user should be null.");
     }
 
     /**
@@ -84,7 +90,8 @@ public class LogOutSystemTests extends TestSystemBase {
 
         userController.setCurrentUser(null);
         userController.logout();
-        assertTrue(view.hasErrorContaining("Not logged in."));
+        assertTrue(view.hasErrorContaining("Not logged in."),
+                "User should not be able to logout whilst not logged in.");
     }
 
     /**
@@ -105,6 +112,7 @@ public class LogOutSystemTests extends TestSystemBase {
 
         // Attempt logout again
         userController.logout();
-        assertTrue(view.hasErrorContaining("Not logged in."));
+        assertTrue(view.hasErrorContaining("Not logged in."),
+                "User should not be able to logout whilst not logged in.");
     }
 }
