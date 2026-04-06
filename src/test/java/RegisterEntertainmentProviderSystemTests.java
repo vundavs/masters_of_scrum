@@ -22,18 +22,22 @@ public class RegisterEntertainmentProviderSystemTests extends TestSystemBase {
                 "Jane Doe", "A new entertainment provider");
 
         userController.registerEntertainmentProvider();
-        assertTrue(view.hasSuccessContaining("Successfully registered Entertainment Provider."));
+        assertTrue(view.hasSuccessContaining("Successfully registered Entertainment Provider."),
+                "Registration should succeed for a new EP with valid details");
 
         // Logout any previous users
         userController.logout();
-        assertNull(userController.getCurrentUser());
+        assertNull(userController.getCurrentUser(),
+                "Current user should be null after logout");
 
         // Attempt to login new EP
         view.addInputs("newep@org.com", "password123");
         userController.login();
 
-        assertTrue(view.hasSuccessContaining("Successfully logged in."));
-        assertInstanceOf(EntertainmentProvider.class, userController.getCurrentUser());
+        assertTrue(view.hasSuccessContaining("Successfully logged in."),
+                "Newly registered EP should be able to log in");
+        assertInstanceOf(EntertainmentProvider.class, userController.getCurrentUser(),
+                "Logged in user should be an EntertainmentProvider");
     }
 
     /**
@@ -48,11 +52,13 @@ public class RegisterEntertainmentProviderSystemTests extends TestSystemBase {
 
         view.addInputs("student1@uni.ac.uk", "pass1");
         userController.login();
-        assertInstanceOf(Student.class, userController.getCurrentUser());
+        assertInstanceOf(Student.class, userController.getCurrentUser(),
+                "Current user should be a Student after login");
 
         // Attempt to register as an EP
         userController.registerEntertainmentProvider();
-        assertTrue(view.hasErrorContaining("Already logged in. Can't register entertainment provider."));
+        assertTrue(view.hasErrorContaining("Already logged in. Can't register entertainment provider."),
+                "Registration should fail when a user is already logged in");
     }
 
 
@@ -70,18 +76,21 @@ public class RegisterEntertainmentProviderSystemTests extends TestSystemBase {
                 "Jane Doe", "A new entertainment provider");
 
         userController.registerEntertainmentProvider();
-        assertTrue(view.hasSuccessContaining("Successfully registered Entertainment Provider."));
+        assertTrue(view.hasSuccessContaining("Successfully registered Entertainment Provider."),
+                "First registration should succeed");
 
         // Logout any previous users
         userController.logout();
-        assertNull(userController.getCurrentUser());
+        assertNull(userController.getCurrentUser(),
+                "Current user should be null after logout");
 
         // Attempt to register with the same details again
         view.addInputs("newep@org.com", "password123", "New Org", "0123456789",
                 "Jane Doe", "A new entertainment provider");
 
         userController.registerEntertainmentProvider();
-        assertTrue(view.hasErrorContaining("Entertainment Provider already exists."));
+        assertTrue(view.hasErrorContaining("Entertainment Provider already exists."),
+                "Registration should fail when EP with same details already exists");
     }
 
     /**
@@ -97,7 +106,8 @@ public class RegisterEntertainmentProviderSystemTests extends TestSystemBase {
         view.addInputs("newep@org.com", "password123", "New Org", "01234567",
                 "Jane Doe", "A new entertainment provider");
         userController.registerEntertainmentProvider();
-        assertTrue(view.hasErrorContaining("Unable to verify entertainment provider."));
+        assertTrue(view.hasErrorContaining("Unable to verify entertainment provider."),
+                "Registration should fail with an invalid business number");
     }
 
     /**
@@ -117,11 +127,11 @@ public class RegisterEntertainmentProviderSystemTests extends TestSystemBase {
 
         EntertainmentProvider ep = (EntertainmentProvider) userController.getCurrentUser();
 
-        assertEquals(ep.getEmail(), "newep@org.com");
-        assertEquals(ep.getPassword(), "password123");
-        assertEquals(ep.getOrgName(), "New Org");
-        assertEquals(ep.getBusinessNumber(), "0123456789");
-        assertEquals(ep.getName(),  "Jane Doe");
-        assertEquals(ep.getDescription(), "A new entertainment provider");
+        assertEquals(ep.getEmail(), "newep@org.com", "EP email should match registered email");
+        assertEquals(ep.getPassword(), "password123", "EP password should match registered password");
+        assertEquals(ep.getOrgName(), "New Org", "EP org name should match registered org name");
+        assertEquals(ep.getBusinessNumber(), "0123456789", "EP business number should match registered business number");
+        assertEquals(ep.getName(), "Jane Doe", "EP name should match registered name");
+        assertEquals(ep.getDescription(), "A new entertainment provider", "EP description should match registered description");
     }
 }
