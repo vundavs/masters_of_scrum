@@ -86,6 +86,7 @@ public class EventPerformanceController extends Controller {
     public void viewPerformance() {
         if (checkCurrentUserIsGuest()) {
             view.displayError("You must be logged in to view performances.");
+            return;
         }
 
         String input = view.getInput("Enter performance ID to view: ");

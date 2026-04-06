@@ -225,7 +225,7 @@ public class Event {
      */
     public String performanceFormat(Performance p) {
         if (p == null) return "No performance found.";
-        if (p.getStatus().equals("CANCELLED")) {
+        if (p.getStatus() == PerformanceStatus.CANCELLED) {
             return "This performance has been cancelled.";
         }
 
